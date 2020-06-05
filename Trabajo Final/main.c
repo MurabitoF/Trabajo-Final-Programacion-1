@@ -36,7 +36,7 @@ int main()
 }
 
 
-int ** pasarArrayMatriz (int fil, int col, char contrasena[])
+int * * pasarArrayMatriz (int fil, int col, char contrasena[])
 {
     int * * aux;
     int k=0;
