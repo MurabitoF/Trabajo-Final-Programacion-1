@@ -6,7 +6,7 @@ typedef struct
     char nombre[30];
     char apellido [30];
     char domicilio [40];
-    char telefono;
+    char telefono[15];
     char email[40];
     int idCliente;
     int bajaCliente;
