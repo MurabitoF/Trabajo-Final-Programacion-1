@@ -14,7 +14,7 @@ typedef struct
     int idCliente;
     int bajaCliente;
     int contrasena;
-} stCliente
+} stCliente;
 
 typedef struct
 {
@@ -24,13 +24,33 @@ typedef struct
     int idCliente;
     int idPedido;
     int pedidoAnulado;
-} stPedido
+} stPedido;
 
+int ** pasarArrayMatriz (int i, int j, char contrasena[]); //Pasa la constraseña (arreglo) a matriz
 
 
 int main()
 {
-    printf("Hello world!\n");
-    printf ("hola");
+
     return 0;
+}
+
+
+int ** pasarArrayMatriz (int fil, int col, char contrasena[])
+{
+    int * * aux;
+    int k=0;
+
+    aux[i] = (int)malloc(fil*sizeof(int));
+
+    for(i=0; i < fil; i++)
+    {
+        aux[i] = (int)malloc(col*sizeof(int));
+        for(j = 0; j < col; j++)
+        {
+            aux[i][j] = contrasena[k];
+            k++;
+        }
+    }
+    return aux;
 }

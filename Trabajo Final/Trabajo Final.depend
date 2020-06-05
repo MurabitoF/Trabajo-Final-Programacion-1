@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1491400450 source:f:\utn\programación y laboratorio\tp final\trabajo-final-programacion-1\trabajo final\gotoxy.c
+	<stdio.h>
+	<stdlib.h>
+	<windows.h>
+
