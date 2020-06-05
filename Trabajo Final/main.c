@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "gotoxy.h"
+
+
 typedef struct
 {
     char nombre[30];
@@ -22,6 +25,8 @@ typedef struct
     int idPedido;
     int pedidoAnulado;
 } stPedido
+
+
 
 int main()
 {
