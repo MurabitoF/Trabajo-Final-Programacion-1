@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <conio.h>
 #include "gotoxy.h"
 
 
@@ -28,9 +29,27 @@ typedef struct
 
 int ** pasarArrayMatriz (int i, int j, char contrasena[]); //Pasa la constraseña (arreglo) a matriz
 
+char Menu();
 
 int main()
 {
+    char opcion;
+    do
+    {
+        switch(opcion = Menu())
+        {
+        case 1:
+            system("cls");
+            printf("Placeholder");
+            system("pause");
+            break;
+        case 2:
+            system("cls");
+            printf("Placeholder");
+            system("pause");
+            break;
+        }
+    } while (opcion != '0');
 
     return 0;
 }
@@ -39,9 +58,9 @@ int main()
 int * * pasarArrayMatriz (int fil, int col, char contrasena[])
 {
     int * * aux;
-    int k=0;
+    int i = 0,j = 0,k=0;
 
-    aux[i] = (int)malloc(fil*sizeof(int));
+    aux = (int *)malloc(fil*sizeof(int));
 
     for(i=0; i < fil; i++)
     {
@@ -54,3 +73,24 @@ int * * pasarArrayMatriz (int fil, int col, char contrasena[])
     }
     return aux;
 }
+
+char Menu()
+{
+    char resp;
+    do
+    {
+        system("cls");
+        printf("============|-----Menu Principal-----|===========\n");
+        printf("=\t\t\t\t\t\t=\n");
+        printf("=   [ 1 ] Ingresar\t\t\t\t=\n");
+        printf("=   [ 2 ] Crear Cuenta\t\t\t\t=\n");
+        printf("=   [ 0 ] Salir\t\t\t\t\t=\n");
+        printf("=\t\t\t\t\t\t=\n");
+        printf("=================================================\n");
+        fflush(stdin);
+        resp = getche ();
+    } while (resp < '0' && resp > '2');
+    return resp;
+}
+
+
