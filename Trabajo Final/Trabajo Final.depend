@@ -13,3 +13,17 @@
 
 1491399896 f:\utn\programación y laboratorio\tp final\trabajo-final-programacion-1\trabajo final\gotoxy.h
 
+1591219472 source:c:\users\franco\documents\github\trabajo-final-programacion-1\trabajo final\gotoxy.c
+	<stdio.h>
+	<stdlib.h>
+	<windows.h>
+
+1591656962 source:c:\users\franco\documents\github\trabajo-final-programacion-1\trabajo final\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<conio.h>
+	"gotoxy.h"
+
+1591219472 c:\users\franco\documents\github\trabajo-final-programacion-1\trabajo final\gotoxy.h
+

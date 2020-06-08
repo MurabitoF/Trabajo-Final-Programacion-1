@@ -27,70 +27,119 @@ typedef struct
     int pedidoAnulado;
 } stPedido;
 
-int ** pasarArrayMatriz (int i, int j, char contrasena[]); //Pasa la constraseña (arreglo) a matriz
+void logo();
+void Menu();
 
-char Menu();
 
 int main()
 {
     char opcion;
     do
     {
-        switch(opcion = Menu())
+        Menu();
+        fflush(stdin);
+        scanf("%c",&opcion);
+        switch(opcion)
         {
-        case 1:
+        case '1':
             system("cls");
             printf("Placeholder");
             system("pause");
             break;
-        case 2:
+        case '2':
             system("cls");
             printf("Placeholder");
             system("pause");
             break;
         }
-    } while (opcion != '0');
+    }
+    while (opcion != '0');
 
     return 0;
 }
 
+/////////////////////////////////Funciones de Interfaz/////////////////////////////////////////
 
-int * * pasarArrayMatriz (int fil, int col, char contrasena[])
+void logo()
 {
-    int * * aux;
-    int i = 0,j = 0,k=0;
+    printf("     _     _             _______  _                 _     _\n");
+    printf("    | |   | |           (_______)(_)               | |   | |\n");
+    printf("    | |___| |  ___   _   _  _     _   ____   ___   | |___| | _____\n");
+    printf("    |_____  | / _ \\ | | | || |   | | / ___) /___)  |_____  |(____ |\n");
+    printf("     _____| || |_| || |_| || |   | |( (___ |___ |   _____| |/ ___ |\n");
+    printf("    (_______| \\___/ |____/ |_|   |_| \\____)(___/   (_______|\\_____|\n");
+}
+void Menu()
+{
 
-    aux = (int *)malloc(fil*sizeof(int));
+    system("cls");
+    logo();
+    printf("============|-----Menu Principal-----|===========\n");
+    printf("=\t\t\t\t\t\t=\n");
+    printf("=   [ 1 ] Ingresar\t\t\t\t=\n");
+    printf("=   [ 2 ] Crear Cuenta\t\t\t\t=\n");
+    printf("=   [ 0 ] Salir\t\t\t\t\t=\n");
+    printf("=\t\t\t\t\t\t=\n");
+    printf("=================================================\n");
+}
 
-    for(i=0; i < fil; i++)
+//////////////////////////////Funciones de Carga/////////////////////////////////////////////
+
+void registrarCliente(char nombreArchivo[], stCliente client)
+{
+    FILE * arch = NULL;
+
+    arch = fopen(nombreArchivo,"ab");
+
+    if(arch != NULL)
     {
-        aux[i] = (int)malloc(col*sizeof(int));
-        for(j = 0; j < col; j++)
-        {
-            aux[i][j] = contrasena[k];
-            k++;
-        }
+        fwrite(&client,sizeof(stCliente),1,arch);
+        fclose(arch);
     }
-    return aux;
 }
 
-char Menu()
+////////////////////////////////Funciones Busqueda////////////////////////////////////////
+
+
+///////////////////////////////Funciones de Operacion////////////////////////////////////
+
+int contadorId(char nombreArchivo[])
 {
-    char resp;
-    do
+    FILE * arch = NULL;
+    int cant = 0;
+
+    arch = fopen(nombreArchivo, "rb");
+
+    if(arch != NULL)
     {
-        system("cls");
-        printf("============|-----Menu Principal-----|===========\n");
-        printf("=\t\t\t\t\t\t=\n");
-        printf("=   [ 1 ] Ingresar\t\t\t\t=\n");
-        printf("=   [ 2 ] Crear Cuenta\t\t\t\t=\n");
-        printf("=   [ 0 ] Salir\t\t\t\t\t=\n");
-        printf("=\t\t\t\t\t\t=\n");
-        printf("=================================================\n");
-        fflush(stdin);
-        resp = getche ();
-    } while (resp < '0' && resp > '2');
-    return resp;
+        fseek(arch, 0, SEEK_END);
+        cant = ftell(arch)/ sizeof(stCliente);
+        fclose(arch);
+    }
+
+    return cant;
 }
+
+//////////////////////////////Funciones de Muestra//////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
