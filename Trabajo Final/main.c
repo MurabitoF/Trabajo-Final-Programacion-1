@@ -122,6 +122,28 @@ int contadorId(char nombreArchivo[])
 
 //////////////////////////////Funciones de Muestra//////////////////////////////////////
 
+void mostrarCliente(char nombreArchivo[],int col)
+{
+    FILE * archi;
+    archi = fopen(nombreArchivo,"rb");
+    stCliente aux;
+    int i,j;
+
+    if(archi!=NULL)
+    {
+        printf("\nContenido del archivo:\n\n");
+        if(fread(&aux,sizeof(stCliente),1,archi))
+        {
+            printf("%s \n", aux.nombre);
+            printf("%s \n", aux.apellido);
+            printf("%s \n", aux.domicilio);
+            printf("%s \n", aux.telefono);
+            printf("%s \n", aux.email);
+            printf("%d \n", aux.idCliente);
+        }
+    }
+    fclose(archi);
+}
 
 
 
