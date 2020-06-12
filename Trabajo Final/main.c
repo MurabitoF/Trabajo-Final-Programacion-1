@@ -28,7 +28,9 @@ typedef struct
 } stPedido;
 
 void logo();
-void Menu();
+void menuIngreso();
+void menuCliente();
+void menuPedido();
 
 
 int main()
@@ -36,9 +38,9 @@ int main()
     char opcion;
     do
     {
-        Menu();
+        menuIngreso();
         fflush(stdin);
-        scanf("%c",&opcion);
+        opcion = getch();
         switch(opcion)
         {
         case '1':
@@ -69,7 +71,7 @@ void logo()
     printf("     _____| || |_| || |_| || |   | |( (___ |___ |   _____| |/ ___ |\n");
     printf("    (_______| \\___/ |____/ |_|   |_| \\____)(___/   (_______|\\_____|\n");
 }
-void Menu()
+void menuIngreso()
 {
 
     system("cls");
@@ -81,6 +83,39 @@ void Menu()
     printf("=   [ 0 ] Salir\t\t\t\t\t=\n");
     printf("=\t\t\t\t\t\t=\n");
     printf("=================================================\n");
+}
+
+void menuCliente()
+{
+    printf("[ 1 ] Nombre y apellido\n");
+    printf("[ 2 ] Domicilio\n");
+    printf("[ 3 ] Numero de telefono\n");
+    printf("[ 4 ] Direccion de email\n");
+    printf("[ 0 ] Volver\n");
+}
+
+void menuPedido()
+{
+    printf("[ 1 ] ID del pedido\n");
+    printf("[ 2 ] ID del Cliente\n");
+    printf("[ 0 ] Volver\n");
+}
+
+int menuLogin (char nombreArchivo[])
+{
+    FILE * arch = NULL;
+
+    arch = fopen(nombreArchivo, "rb");
+
+    char email[40];
+    char password[15];
+
+    if (arch != NULL)
+    {
+        printf("Email: ");
+        scanf("%s", &email);
+        printf("Contrase%da: ", 164);
+    }
 }
 
 //////////////////////////////Funciones de Carga/////////////////////////////////////////////
@@ -121,13 +156,6 @@ int contadorId(char nombreArchivo[])
 }
 
 //////////////////////////////Funciones de Muestra//////////////////////////////////////
-
-
-
-
-
-
-
 
 
 
