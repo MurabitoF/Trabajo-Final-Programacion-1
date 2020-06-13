@@ -14,7 +14,7 @@ typedef struct
     char email[40];
     int idCliente;
     int bajaCliente;
-    //int contrasena;
+    int * password;
     int admin;
 } stCliente;
 //Estructura de pedidos
@@ -54,6 +54,9 @@ int contadorDatos(char nombreArchivo[], int byte); //Cuenta cuantos bloques de d
 void fechaHora(char * fecha[]); //Devuelve la fecha y la hora del sistema.
 float totalCarrito(stProducto carro[], int cantProd);  //Cuenta el total del carrito de compras.
 void llenarCarrito(char nombreArchivo[], stProducto carro[], int idProd, int cantProd); //Carga el carrito de compras con productos.
+void encriptarPass(char password[], int encript[],int col);
+void multMatrices(int col, int M1[3][3], int M2[3][col], int M3[3][col]);
+void pasarArrayMatriz (int fil, int col, int mat[fil][col],char contrasena[]);
 //////////////////////////////Funciones de Muestra//////////////////////////////////////
 void mostrarCliente(stCliente client); //Muestra un cliente, con formato.
 void mostrarPedido(stPedido pedido); //Muestra un pedido, con formato.
@@ -62,6 +65,9 @@ void mostrarClientes(char nombreArchivo[]);  //Muestra todos los clientes en un 
 void mostrarPedidos(char nombreArchivo[]);  //Muestra todos los pedidos en un archivo.
 void mostrarProductos(char nombreArchivo[]); //Muestra todos los productos en un archivo.
 
+const char aClientes[] = {"clientes.dat"};
+const char aPedidos[] = {"pedidos.dat"};
+const char aProductos[] = {"productos.dat"};
 
 int main()
 {
@@ -123,6 +129,8 @@ void menu()
 void crearCliente(char nombreArchivo[])  //Ingresa los datos por teclado los datos para crear un cliente.
 {
     stCliente client;
+    int cant = 0;
+    char pass[100];
 
     printf("Nombre: ");
     fflush(stdin);
@@ -164,6 +172,16 @@ void crearCliente(char nombreArchivo[])  //Ingresa los datos por teclado los dat
         fflush(stdin);
         gets(client.email);
     }
+
+    printf("Contrase%ca: ",164);
+    fflush(stdin);
+    scanf("%s", &pass);
+    cant = 1 + (strlen(pass) / 3);
+
+    client.password = (int *)malloc((3*cant)*sizeof(int));
+
+    encriptarPass(pass, client.password, cant);
+
     client.idCliente = contadorDatos(nombreArchivo, sizeof(stCliente)) + 1;
     printf("%d \n", client.idCliente);
     client.bajaCliente = 0;
@@ -291,6 +309,11 @@ int encontroProducto(FILE * archivo, int idProd)  //Busca un producto en un arch
         }
     }
 
+    if(ctrl && !feof(archivo))
+    {
+        fseek(archivo,-1*sizeof(stProducto),SEEK_CUR);
+    }
+
     return ctrl;
 }
 
@@ -354,6 +377,72 @@ void llenarCarrito(char nombreArchivo[], stProducto carro[], int idProd, int can
     }
 }
 
+void encriptarPass(char password[], int encript[],int col)
+{
+    int i,j,k=0;
+    int codigo[3][3]=
+    {
+        {1,2,3},
+        {0,1,2},
+        {2,1,1},
+    };
+    int matriz[3][col];
+    int encrip[3][col];
+
+    pasarArrayMatriz(3,col,matriz,password);
+
+    multMatrices(col,codigo,matriz,encrip);
+
+    for(j = 0; j < col; j++)
+    {
+        for(i=0; i < 3; i++)
+        {
+            encript[k] = encrip[i][j];
+            k++;
+        }
+    }
+}
+
+void multMatrices(int col, int M1[3][3], int M2[3][col], int M3[3][col])
+{
+    int i,j,k;
+    int aux = 0;
+
+    for(k = 0; k < 3; k++)
+    {
+        for(i = 0; i < col; i++)
+        {
+            aux = 0;
+            for(j = 0; j < 3; j++)
+            {
+                aux += M1[k][j] * M2[j][i];
+            }
+            M3[k][i] = aux;
+        }
+    }
+}
+
+void pasarArrayMatriz (int fil, int col, int mat[fil][col],char contrasena[])
+{
+    int i,j,k=0;
+
+    for(j = 0; j < col; j++)
+    {
+        for(i = 0; i < fil; i++)
+        {
+            if(k>strlen(contrasena))
+            {
+                mat[i][j] = 0;
+            }
+            else
+            {
+                mat[i][j] = contrasena[k];
+                k++;
+            }
+        }
+    }
+}
+
 //////////////////////////////Funciones de Muestra//////////////////////////////////////
 
 void mostrarCliente(stCliente client) //Muestra un cliente, con formato.
@@ -405,7 +494,7 @@ void mostrarClientes(char nombreArchivo[])  //Muestra todos los clientes en un a
     {
         while(fread(&aux,sizeof(stCliente),1,arch)>0)
         {
-            if(aux.bajaCliente == 0)
+            if(aux.bajaCliente == 1)
             {
                 mostrarCliente(aux);
             }
@@ -425,7 +514,7 @@ void mostrarPedidos(char nombreArchivo[])  //Muestra todos los pedidos en un arc
     {
         while(fread(&aux,sizeof(stPedido),1,arch)>0)
         {
-            if(aux.pedidoAnulado == 0)
+            if(aux.pedidoAnulado == 1)
             {
                 mostrarPedido(aux);
             }
