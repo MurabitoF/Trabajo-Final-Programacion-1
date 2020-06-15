@@ -38,33 +38,58 @@ typedef struct
 
 /////////////////Funciones de Interfaz//////////////////////
 void logo();
+
 void menu();
+
 //////////////////////////////Funciones de Carga/////////////////////////////////////////////
 void crearCliente(char nombreArchivo[]);  //Ingresa los datos por teclado los datos para crear un cliente.
+
 void registrarCliente(char nombreArchivo[], stCliente client); //Registra un cliente en un archivo.
+
 void crearPedido(char nombreArchivo[], stProducto carro[], int cantProd, int idCliente); //Completa los datos para crear un pedido.
+
 void registrarPedido(char nombreArchivo[], stPedido pedid);  //Registra un pedido en un archivo.
+
 void crearProducto(char nombreArchivo[]);  //Ingresa por teclado los datos para crear un producto.
+
 void registrarProducto(char nombreArchivo[], stProducto prod);  //Registra un producto en un archivo.
+
 ////////////////////////////////Funciones Busqueda////////////////////////////////////////
 int encuentraCliente (char nombreArchivo[], char dato[]);  //Busca si existe un cliente en base a su email.
+
 int encontroProducto(FILE * archivo, int idProd);  //Busca un producto en un archivo, si lo encuentra devuelve 1 en caso contrario 0.
+
 ///////////////////////////////Funciones de Operacion////////////////////////////////////
 int contadorDatos(char nombreArchivo[], int byte); //Cuenta cuantos bloques de datos hay en un archivo y devuelve el valor.
+
 void fechaHora(char * fecha[]); //Devuelve la fecha y la hora del sistema.
+
 float totalCarrito(stProducto carro[], int cantProd);  //Cuenta el total del carrito de compras.
+
 void llenarCarrito(char nombreArchivo[], stProducto carro[], int idProd, int cantProd); //Carga el carrito de compras con productos.
-void encriptarPass(char password[], int encript[],int col); //Encripta una contraseña y la guarda en un array.
-void multMatrices(int col, int M1[3][3], int M2[3][col], int M3[3][col]);  //multiplica dos matrices
-void pasarArrayMatriz (int fil, int col, int mat[fil][col],char contrasena[]); //pasa de un array de char a una matriz de enteros.
+
+void encriptarPass(char password[], int encript[],int col);
+
+void multMatrices(int col, int M1[3][3], int M2[3][col], int M3[3][col]);
+
+void pasarArrayMatriz (int fil, int col, int mat[fil][col],char contrasena[]);
+
 //////////////////////////////Funciones de Muestra//////////////////////////////////////
 void mostrarCliente(stCliente client); //Muestra un cliente, con formato.
+
 void mostrarPedido(stPedido pedido); //Muestra un pedido, con formato.
+
 void mostrarProducto(stProducto product); //Muestra un productos, con formato.
+
 void mostrarClientes(char nombreArchivo[]);  //Muestra todos los clientes en un archivo.
+
 void mostrarPedidos(char nombreArchivo[]);  //Muestra todos los pedidos en un archivo.
+
 void mostrarProductos(char nombreArchivo[]); //Muestra todos los productos en un archivo.
 
+const char aClientes[] = {"clientes.dat"};
+const char aPedidos[] = {"pedidos.dat"};
+const char aProductos[] = {"productos.dat"};
 
 int main()
 {
@@ -126,6 +151,8 @@ void menu()
 void crearCliente(char nombreArchivo[])  //Ingresa los datos por teclado los datos para crear un cliente.
 {
     stCliente client;
+    int cant = 0;
+    char pass[100];
 
     printf("Nombre: ");
     fflush(stdin);
@@ -171,16 +198,18 @@ void crearCliente(char nombreArchivo[])  //Ingresa los datos por teclado los dat
     printf("Contrase%ca: ",164);
     fflush(stdin);
     scanf("%s", &pass);
-    cant = 1 + (strlen(pass) / 3);  //Divido la longitud de la contraseña por 3 y redondeo para arriva.
-    client.password = (int *)malloc((3*cant)*sizeof(int)); //Creo mi array de int para guardar la contraseña.
-    encriptarPass(pass, client.password, cant);  //Encripto mi contraseña ingresada por teclado.
+    cant = 1 + (strlen(pass) / 3);
+
+    client.password = (int *)malloc((3*cant)*sizeof(int));
+
+    encriptarPass(pass, client.password, cant);
 
     client.idCliente = contadorDatos(nombreArchivo, sizeof(stCliente)) + 1;
     printf("%d \n", client.idCliente);
     client.bajaCliente = 0;
     client.admin = 0;
 
-    if(!encuentraCliente(nombreArchivo, client.email))  //Compruebo si mi nuevo cliente esta registrado.
+    if(!encuentraCliente(nombreArchivo, client.email))
     {
         registrarCliente(nombreArchivo, client);
     }
@@ -302,6 +331,11 @@ int encontroProducto(FILE * archivo, int idProd)  //Busca un producto en un arch
         }
     }
 
+    if(ctrl && !feof(archivo))
+    {
+        fseek(archivo,-1*sizeof(stProducto),SEEK_CUR);
+    }
+
     return ctrl;
 }
 
@@ -365,8 +399,7 @@ void llenarCarrito(char nombreArchivo[], stProducto carro[], int idProd, int can
     }
 }
 
-
-void encriptarPass(char password[], int encript[],int col) //Encripta un array de char y devuelve un array de numeros.
+void encriptarPass(char password[], int encript[],int col)
 {
     int i,j,k=0;
     int codigo[3][3]=
@@ -392,7 +425,7 @@ void encriptarPass(char password[], int encript[],int col) //Encripta un array d
     }
 }
 
-void multMatrices(int col, int M1[3][3], int M2[3][col], int M3[3][col]) //Multiplica dos matrices.
+void multMatrices(int col, int M1[3][3], int M2[3][col], int M3[3][col])
 {
     int i,j,k;
     int aux = 0;
@@ -411,9 +444,9 @@ void multMatrices(int col, int M1[3][3], int M2[3][col], int M3[3][col]) //Multi
     }
 }
 
-void pasarArrayMatriz (int fil, int col, int mat[fil][col],char contrasena[]) //Pasa de un array de char a una matriz de numeros.
-{                                                                             //Las filas siempre son 3 y las columnas las calcula previamente, si la palabra no alcanza a llenar la matriz
-    int i,j,k=0;                                                              //se rellena con 0.
+void pasarArrayMatriz (int fil, int col, int mat[fil][col],char contrasena[])
+{
+    int i,j,k=0;
 
     for(j = 0; j < col; j++)
     {
@@ -483,7 +516,7 @@ void mostrarClientes(char nombreArchivo[])  //Muestra todos los clientes en un a
     {
         while(fread(&aux,sizeof(stCliente),1,arch)>0)
         {
-            if(aux.bajaCliente == 0)
+            if(aux.bajaCliente == 1)
             {
                 mostrarCliente(aux);
             }
@@ -503,7 +536,7 @@ void mostrarPedidos(char nombreArchivo[])  //Muestra todos los pedidos en un arc
     {
         while(fread(&aux,sizeof(stPedido),1,arch)>0)
         {
-            if(aux.pedidoAnulado == 0)
+            if(aux.pedidoAnulado == 1)
             {
                 mostrarPedido(aux);
             }
