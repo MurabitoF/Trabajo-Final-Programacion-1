@@ -199,10 +199,8 @@ void crearCliente(char nombreArchivo[])  //Ingresa los datos por teclado los dat
     fflush(stdin);
     scanf("%s", &pass);
     cant = 1 + (strlen(pass) / 3);
-
-    client.password = (int *)malloc((3*cant)*sizeof(int));
-
-    encriptarPass(pass, client.password, cant);
+    client.password = (int *)malloc((3*cant)*sizeof(int)); //Creo mi array de int para guardar la contraseña.
+    encriptarPass(pass, client.password, cant);  //Encripto mi contraseña ingresada por teclado.
 
     client.idCliente = contadorDatos(nombreArchivo, sizeof(stCliente)) + 1;
     printf("%d \n", client.idCliente);
@@ -399,7 +397,7 @@ void llenarCarrito(char nombreArchivo[], stProducto carro[], int idProd, int can
     }
 }
 
-void encriptarPass(char password[], int encript[],int col)
+void encriptarPass(char password[], int encript[],int col) //Encripta un array de char y devuelve un array de numeros.
 {
     int i,j,k=0;
     int codigo[3][3]=
