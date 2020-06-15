@@ -54,9 +54,9 @@ int contadorDatos(char nombreArchivo[], int byte); //Cuenta cuantos bloques de d
 void fechaHora(char * fecha[]); //Devuelve la fecha y la hora del sistema.
 float totalCarrito(stProducto carro[], int cantProd);  //Cuenta el total del carrito de compras.
 void llenarCarrito(char nombreArchivo[], stProducto carro[], int idProd, int cantProd); //Carga el carrito de compras con productos.
-void encriptarPass(char password[], int encript[],int col);
-void multMatrices(int col, int M1[3][3], int M2[3][col], int M3[3][col]);
-void pasarArrayMatriz (int fil, int col, int mat[fil][col],char contrasena[]);
+void encriptarPass(char password[], int encript[],int col); //Encripta una contraseña y la guarda en un array.
+void multMatrices(int col, int M1[3][3], int M2[3][col], int M3[3][col]);  //multiplica dos matrices
+void pasarArrayMatriz (int fil, int col, int mat[fil][col],char contrasena[]); //pasa de un array de char a una matriz de enteros.
 //////////////////////////////Funciones de Muestra//////////////////////////////////////
 void mostrarCliente(stCliente client); //Muestra un cliente, con formato.
 void mostrarPedido(stPedido pedido); //Muestra un pedido, con formato.
@@ -176,18 +176,18 @@ void crearCliente(char nombreArchivo[])  //Ingresa los datos por teclado los dat
     printf("Contrase%ca: ",164);
     fflush(stdin);
     scanf("%s", &pass);
-    cant = 1 + (strlen(pass) / 3);
+    cant = 1 + (strlen(pass) / 3);  //Divido la longitud de la contraseña por 3 y redondeo para arriva.
 
-    client.password = (int *)malloc((3*cant)*sizeof(int));
+    client.password = (int *)malloc((3*cant)*sizeof(int)); //Creo mi array de int para guardar la contraseña.
 
-    encriptarPass(pass, client.password, cant);
+    encriptarPass(pass, client.password, cant);  //Encripto mi contraseña ingresada por teclado.
 
     client.idCliente = contadorDatos(nombreArchivo, sizeof(stCliente)) + 1;
     printf("%d \n", client.idCliente);
     client.bajaCliente = 0;
     client.admin = 0;
 
-    if(!encuentraCliente(nombreArchivo, client.email))
+    if(!encuentraCliente(nombreArchivo, client.email))  //Compruebo si mi nuevo cliente esta registrado.
     {
         registrarCliente(nombreArchivo, client);
     }
@@ -377,7 +377,7 @@ void llenarCarrito(char nombreArchivo[], stProducto carro[], int idProd, int can
     }
 }
 
-void encriptarPass(char password[], int encript[],int col)
+void encriptarPass(char password[], int encript[],int col) //Encripta un array de char y devuelve un array de numeros.
 {
     int i,j,k=0;
     int codigo[3][3]=
@@ -403,7 +403,7 @@ void encriptarPass(char password[], int encript[],int col)
     }
 }
 
-void multMatrices(int col, int M1[3][3], int M2[3][col], int M3[3][col])
+void multMatrices(int col, int M1[3][3], int M2[3][col], int M3[3][col]) //Multiplica dos matrices.
 {
     int i,j,k;
     int aux = 0;
@@ -422,9 +422,9 @@ void multMatrices(int col, int M1[3][3], int M2[3][col], int M3[3][col])
     }
 }
 
-void pasarArrayMatriz (int fil, int col, int mat[fil][col],char contrasena[])
-{
-    int i,j,k=0;
+void pasarArrayMatriz (int fil, int col, int mat[fil][col],char contrasena[]) //Pasa de un array de char a una matriz de numeros.
+{                                                                             //Las filas siempre son 3 y las columnas las calcula previamente, si la palabra no alcanza a llenar la matriz
+    int i,j,k=0;                                                              //se rellena con 0.
 
     for(j = 0; j < col; j++)
     {
