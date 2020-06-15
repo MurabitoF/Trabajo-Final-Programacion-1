@@ -65,9 +65,6 @@ void mostrarClientes(char nombreArchivo[]);  //Muestra todos los clientes en un 
 void mostrarPedidos(char nombreArchivo[]);  //Muestra todos los pedidos en un archivo.
 void mostrarProductos(char nombreArchivo[]); //Muestra todos los productos en un archivo.
 
-const char aClientes[] = {"clientes.dat"};
-const char aPedidos[] = {"pedidos.dat"};
-const char aProductos[] = {"productos.dat"};
 
 int main()
 {
@@ -129,8 +126,6 @@ void menu()
 void crearCliente(char nombreArchivo[])  //Ingresa los datos por teclado los datos para crear un cliente.
 {
     stCliente client;
-    int cant = 0;
-    char pass[100];
 
     printf("Nombre: ");
     fflush(stdin);
@@ -177,9 +172,7 @@ void crearCliente(char nombreArchivo[])  //Ingresa los datos por teclado los dat
     fflush(stdin);
     scanf("%s", &pass);
     cant = 1 + (strlen(pass) / 3);  //Divido la longitud de la contraseña por 3 y redondeo para arriva.
-
     client.password = (int *)malloc((3*cant)*sizeof(int)); //Creo mi array de int para guardar la contraseña.
-
     encriptarPass(pass, client.password, cant);  //Encripto mi contraseña ingresada por teclado.
 
     client.idCliente = contadorDatos(nombreArchivo, sizeof(stCliente)) + 1;
@@ -309,11 +302,6 @@ int encontroProducto(FILE * archivo, int idProd)  //Busca un producto en un arch
         }
     }
 
-    if(ctrl && !feof(archivo))
-    {
-        fseek(archivo,-1*sizeof(stProducto),SEEK_CUR);
-    }
-
     return ctrl;
 }
 
@@ -376,6 +364,7 @@ void llenarCarrito(char nombreArchivo[], stProducto carro[], int idProd, int can
         fclose(archi);
     }
 }
+
 
 void encriptarPass(char password[], int encript[],int col) //Encripta un array de char y devuelve un array de numeros.
 {
@@ -494,7 +483,7 @@ void mostrarClientes(char nombreArchivo[])  //Muestra todos los clientes en un a
     {
         while(fread(&aux,sizeof(stCliente),1,arch)>0)
         {
-            if(aux.bajaCliente == 1)
+            if(aux.bajaCliente == 0)
             {
                 mostrarCliente(aux);
             }
@@ -514,7 +503,7 @@ void mostrarPedidos(char nombreArchivo[])  //Muestra todos los pedidos en un arc
     {
         while(fread(&aux,sizeof(stPedido),1,arch)>0)
         {
-            if(aux.pedidoAnulado == 1)
+            if(aux.pedidoAnulado == 0)
             {
                 mostrarPedido(aux);
             }
