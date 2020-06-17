@@ -77,6 +77,10 @@ int encuentraDomicilio(char nombreArchivo[], char dato[]); //Busca un cliente co
 
 int encuentraTelefono (char nombreArchivo[], char dato[]); //Busca un cliente con "x" telefono
 
+void buscaPedidoIdCliente (int idCliente, char nombreArchivo[]); //Busca los pedidos correspondientes a un cliente determinado
+
+void buscaIdPedido (int idPedido, int idCliente, char nombreArchivo[]); // Busca un pedido según su id
+
 int encontroProducto(FILE * archivo, int idProd);  //Busca un producto en un archivo, si lo encuentra devuelve 1 en caso contrario 0.
 
 ///////////////////////////////Funciones de Operacion////////////////////////////////////
@@ -103,7 +107,7 @@ void mostrarProducto(stProducto product); //Muestra un productos, con formato.
 
 void mostrarClientes(char nombreArchivo[]);  //Muestra todos los clientes en un archivo.
 
-void mostrarPedidos(char nombreArchivo[], int idClint);  //Muestra todos los pedidos en un archivo.
+void mostrarPedidos(char nombreArchivo[]);  //Muestra todos los pedidos en un archivo.
 
 void mostrarProductos(char nombreArchivo[]); //Muestra todos los productos en un archivo.
 
@@ -229,6 +233,7 @@ void menuPrincipal(stCliente clientLoged)
     int i,op=0,cant=0;
     char menu;
     stProducto carrito[20];
+    int idClint;
 
     do
     {
@@ -243,7 +248,8 @@ void menuPrincipal(stCliente clientLoged)
             printf("5. Listado de Clientes\n");
             printf("6. Buscar Cliente\n");
             printf("7. Agregar Producto\n");
-            printf("8. Buscar Pedido por ID del cliente\n");
+            printf("8. Listado de Pedidos\n");
+            printf("9. Buscar Pedido por ID del cliente\n");
         }
         printf("0. Salir\n");
 
@@ -280,7 +286,7 @@ void menuPrincipal(stCliente clientLoged)
             break;
         case 2:
             system("cls");
-            mostrarPedidos(aPedidos,clientLoged.idCliente);
+            buscaPedidoIdCliente(clientLoged.idCliente, aPedidos);
             break;
         case 3:
 
@@ -303,8 +309,12 @@ void menuPrincipal(stCliente clientLoged)
                 crearProducto(aProductos);
             break;
         case 8:
-            //buscar pedido
+            mostrarPedidos(aPedidos);
             break;
+        case 9:
+            printf("Ingrese el id de un cliente");
+            scanf("%d", &idClint);
+            buscaPedidoIdCliente(idClint, aPedidos);
         }
     }
     while(op != 0);
@@ -700,6 +710,93 @@ int encontroProducto(FILE * archivo, int idProd)  //Busca un producto en un arch
     return ctrl;
 }
 
+void buscaPedidoIdCliente (int idCliente, char nombreArchivo[])
+{
+    FILE * archi = NULL;
+    archi = fopen(nombreArchivo, "rb");
+
+    stPedido pedido;
+    int idC = idCliente;
+    int idP;
+    int flag = 0;
+
+    char control = 's';
+
+    if (archi!=NULL)
+    {
+        do
+        {
+            system("cls");
+            rewind(archi);
+            while (!feof(archi))
+            {
+                if (fread(&pedido, sizeof(stPedido), 1, archi) > 0)
+                {
+                    if (pedido.idCliente == idC)
+                    {
+                        mostrarPedido(pedido);
+                        flag = 1;
+                    }
+                }
+
+            }
+            if (flag == 1)
+            {
+                printf("\nDesea modificar algun pedido? s/n ");
+                fflush(stdin);
+                control = getch();
+                if (control == 's')
+                {
+                    printf("Ingrese la id del pedido a modificar: ");
+                    scanf("%d", &idP);
+                    buscaIdPedido(idP, idC, archi);
+                    printf("Desea continuar? s/n");
+                    fflush(stdin);
+                    control = getch();
+                }
+                else
+                {
+                    system("cls");
+                    printf("El cliente no tiene pedidos");
+                    printf("Desea continuar? s/n");
+                    fflush(stdin);
+                    control = getch();
+                }
+            }
+
+        }
+        while (control == 's');
+    }
+}
+
+void buscaIdPedido (int idPedido, int idCliente, char nombreArchivo[])
+{
+    int idP = idPedido;
+    stPedido pedido;
+    char opcion = 's';
+
+    rewind(nombreArchivo);
+    while (fread(&pedido, sizeof(stPedido), 1, nombreArchivo) > 0)
+    {
+        if (pedido.idPedido == idP && pedido.idCliente == idCliente)
+        {
+            do
+            {
+                mostrarPedido(pedido);
+                printf("Queres modificar el pedido? s/n");
+                fflush(stdin);
+                opcion = getch();
+                printf("Placeholder\n");
+            }
+            while (opcion == 's');
+        }
+        else
+        {
+            printf("No se pudo encontrar el pedido o no corresponde al cliente conectado");
+        }
+    }
+}
+
 ///////////////////////////////Funciones de Operacion////////////////////////////////////
 
 int contadorDatos(char nombreArchivo[], int byte) //Cuenta cuantos bloques de datos hay en un archivo y devuelve el valor.
@@ -886,7 +983,7 @@ void mostrarClientes(char nombreArchivo[])  //Muestra todos los clientes en un a
     }
 }
 
-void mostrarPedidos(char nombreArchivo[], int idClint)  //Muestra todos los pedidos en un archivo.
+void mostrarPedidos(char nombreArchivo[])  //Muestra todos los pedidos en un archivo.
 {
     FILE * arch;
     stPedido aux;
@@ -897,7 +994,7 @@ void mostrarPedidos(char nombreArchivo[], int idClint)  //Muestra todos los pedi
     {
         while(fread(&aux,sizeof(stPedido),1,arch)>0)
         {
-            if(aux.pedidoAnulado == 1 && idClint == aux.idCliente)
+            if(aux.pedidoAnulado == 1)
             {
                 mostrarPedido(aux);
             }
