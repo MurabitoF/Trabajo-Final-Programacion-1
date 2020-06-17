@@ -1,0 +1,41 @@
+ID:                1
+Nombre y Apellido: Franco Murabito
+Domicilio:         Calle 1234
+Telefono:          234234
+Email:             correo@falso.com
+Pass: Milanesa
+
+ID:                2
+Nombre y Apellido: Juan Manuel Erreguerena
+Domicilio:         Calle 6541
+Telefono:          3265621
+Email:             falso@correo.com
+Pass: TPFinal
+
+ID:                3
+Nombre y Apellido: Diego Esersky
+Domicilio:         Calle 3421
+Telefono:          23423423
+Email:             correofalso@falso.com
+Pass: Programacion
+
+ID:                4
+Nombre y Apellido: Peter Parker
+Domicilio:         Calle 6545
+Telefono:          234234
+Email:             spiderM@gmail.com
+Pass: MaryJane
+
+ID:                5
+Nombre y Apellido: Clark Kent
+Domicilio:         Calle 7654
+Telefono:          6754664
+Email:             superman@yahoo.com
+Pass: Kriptonita
+
+ID:                6
+Nombre y Apellido: Homero Simpson
+Domicilio:         Av Siempreviva 742
+Telefono:          654654
+Email:             homeroS@outlook.com
+Pass: Donas22

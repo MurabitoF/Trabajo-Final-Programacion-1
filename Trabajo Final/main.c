@@ -14,7 +14,7 @@ typedef struct
     char email[40];
     int idCliente;
     int bajaCliente;
-    int * password;
+    int password[30];
     int admin;
 } stCliente;
 //Estructura de pedidos
@@ -41,6 +41,12 @@ void logo();
 
 void menu();
 
+void menuBuscaCliente();
+
+int menuLogin (stCliente * clienteLog, char nombreArchivo[]);
+
+void menuPrincipal(stCliente clientLoged);
+
 //////////////////////////////Funciones de Carga/////////////////////////////////////////////
 void crearCliente(char nombreArchivo[]);  //Ingresa los datos por teclado los datos para crear un cliente.
 
@@ -55,7 +61,21 @@ void crearProducto(char nombreArchivo[]);  //Ingresa por teclado los datos para 
 void registrarProducto(char nombreArchivo[], stProducto prod);  //Registra un producto en un archivo.
 
 ////////////////////////////////Funciones Busqueda////////////////////////////////////////
+void busquedaCliente (stCliente cliente, char nombreArchivo[]); //Opcion para buscar clientes según datos varios
+
 int encuentraCliente (char nombreArchivo[], char dato[]);  //Busca si existe un cliente en base a su email.
+
+int encuentraNombreApellido (char nombreArchivo[], char dato[]);
+
+int encuentraPassword (FILE * arch, int dato[], int cant);  //Encripta y compara la contraseña ingresada con la guardada
+
+int encuentraEmail (char nombreArchivo[], char dato[]); //Busca un cliente con "x" email
+
+int encuentraNombreApellido (char nombreArchivo[], char dato[]); //Busca si existe un cliente con "x" nombre y apellido
+
+int encuentraDomicilio(char nombreArchivo[], char dato[]); //Busca un cliente con "x" domicilio
+
+int encuentraTelefono (char nombreArchivo[], char dato[]); //Busca un cliente con "x" telefono
 
 int encontroProducto(FILE * archivo, int idProd);  //Busca un producto en un archivo, si lo encuentra devuelve 1 en caso contrario 0.
 
@@ -83,7 +103,7 @@ void mostrarProducto(stProducto product); //Muestra un productos, con formato.
 
 void mostrarClientes(char nombreArchivo[]);  //Muestra todos los clientes en un archivo.
 
-void mostrarPedidos(char nombreArchivo[]);  //Muestra todos los pedidos en un archivo.
+void mostrarPedidos(char nombreArchivo[], int idClint);  //Muestra todos los pedidos en un archivo.
 
 void mostrarProductos(char nombreArchivo[]); //Muestra todos los productos en un archivo.
 
@@ -94,6 +114,8 @@ const char aProductos[] = {"productos.dat"};
 int main()
 {
     char opcion;
+    stCliente clienteLoged;
+
     do
     {
         menu();
@@ -103,7 +125,14 @@ int main()
         {
         case '1':
             system("cls");
-            printf("Placeholder");
+            if (menuLogin(&clienteLoged, aClientes) == 1)
+            {
+                menuPrincipal(clienteLoged);
+            }
+            else
+            {
+                printf("El email o la contrase%ca no corresponden a un usario\n", 164);
+            }
             system("pause");
             break;
         case '2':
@@ -146,34 +175,139 @@ void menu()
     printf("=================================================\n");
 }
 
-int menuLogin (stCliente * cliente, char nombreArchivo[])
+void menuBuscaCliente()
+{
+    printf("============|-----Busqueda de Clientes-----|===========\n");
+    printf("[ 1 ] Nombre y apellido\n");
+    printf("[ 2 ] Domicilio\n");
+    printf("[ 3 ] Numero de telefono\n");
+    printf("[ 4 ] Direccion de email\n");
+    printf("[ 0 ] Volver\n");
+    printf("=======================================================\n");
+}
+
+int menuLogin (stCliente * clienteLoged, char nombreArchivo[])
 {
     FILE * arch = NULL;
 
     arch = fopen(nombreArchivo, "rb");
 
     char email[40];
-    char password[15];
+    char password[30] = {0};
+
+    int cant;
     int control = 0;
     int fEmail = 0, fPass = 0;
+    int passEncr[30] = {0};
 
     if (arch != NULL)
     {
         printf("Email: ");
         scanf("%s", &email);
-        printf("Contrase%da: ", 164);
+        /*printf("Contrase%ca: ", 164);
         scanf("%s", &password);
+        cant = 1 + (strlen(password) / 3);
+        encriptarPass(password, passEncr, cant);*/
+
         fEmail = encuentraEmail(arch, email);
-        fPass = encuentraPassword(arch, password);
-        if (fEmail != 0 && fPass != 0)
+        //fPass = encuentraPassword(arch, passEncr, cant*3);
+
+        if (fEmail != 0 /*&& fPass != 0*/)
         {
+            control = 1;
             rewind(arch);
             fseek(arch, fEmail-sizeof(stCliente), SEEK_CUR);
-            fread(cliente, sizeof(stCliente), 1, arch);
+            fread(clienteLoged, sizeof(stCliente), 1, arch);
         }
     }
     fclose(arch);
     return control;
+}
+
+void menuPrincipal(stCliente clientLoged)
+{
+    int i,op=0,cant=0;
+    char menu;
+    stProducto carrito[20];
+
+    do
+    {
+        system("cls");
+        printf("Bienvenido %s\n\n", clientLoged.nombreApellido);
+        printf("1. Hacer un pedido\n");
+        printf("2. Mis Pedidos\n");
+        printf("3. Cancelar Pedido\n");
+        printf("4. Opciones\n");
+        if(clientLoged.admin)
+        {
+            printf("5. Listado de Clientes\n");
+            printf("6. Buscar Cliente\n");
+            printf("7. Agregar Producto\n");
+            printf("8. Buscar Pedido por ID del cliente\n");
+        }
+        printf("0. Salir\n");
+
+        printf("Ingrese la opcion: ");
+        scanf("%d",&op);
+
+        switch(op)
+        {
+        case 1:
+            system("cls");
+            mostrarProductos(aProductos);
+            do
+            {
+                printf("Menu: ");
+                scanf("%d", &menu);
+                llenarCarrito(aProductos,carrito,op,cant);
+                cant++;
+
+            }
+            while(menu != 0);
+            printf("Su Pedido es: \n");
+
+            for(i = 0; i < cant-1; i++)
+            {
+                mostrarProducto(carrito[i]);
+            }
+            printf("Su pedido es correcto? s/n\n");
+            fflush(stdin);
+            scanf("%c",&menu);
+            if(menu == 's')
+            {
+                crearPedido(aPedidos, carrito, cant-1,1);
+            }
+            break;
+        case 2:
+            system("cls");
+            mostrarPedidos(aPedidos,clientLoged.idCliente);
+            break;
+        case 3:
+
+            break;
+        case 4:
+            //menuOpciones(clientLoged);
+            break;
+        case 5:
+            mostrarClientes(aClientes);
+            break;
+        case 6:
+            busquedaCliente(clientLoged, aClientes);
+            break;
+        case 7:
+            mostrarProductos(aProductos);
+            printf("\nQuiere agregar un producto nuevo? s/n\n");
+            fflush(stdin);
+            scanf("%c", &menu);
+            if(menu == 's')
+                crearProducto(aProductos);
+            break;
+        case 8:
+            //buscar pedido
+            break;
+        }
+    }
+    while(op != 0);
 }
 
 //////////////////////////////Funciones de Carga/////////////////////////////////////////////
@@ -229,8 +363,6 @@ void crearCliente(char nombreArchivo[])  //Ingresa los datos por teclado los dat
     fflush(stdin);
     scanf("%s", &pass);
     cant = 1 + (strlen(pass) / 3);
-
-    client.password = (int *)malloc((3*cant)*sizeof(int));
 
     encriptarPass(pass, client.password, cant);
 
@@ -325,6 +457,119 @@ void registrarProducto(char nombreArchivo[], stProducto prod)  //Registra un pro
 
 ////////////////////////////////Funciones Busqueda////////////////////////////////////////
 
+void busquedaCliente (stCliente cliente, char nombreArchivo[]) //Funcion principal de busqueda de clientes
+{
+    char dato[60];
+    char opcion;
+    int control = 0;
+    char modific;
+
+    FILE * bufferArch = fopen(nombreArchivo, "rb");
+
+    if (bufferArch != NULL)
+    {
+        do
+        {
+            control = 0;
+            rewind(bufferArch);
+            system("cls");
+            menuBuscaCliente();
+            fflush(stdin);
+            opcion = getch();
+            switch (opcion)
+            {
+            //Busca nombre y apellido
+            case '1':
+                system("cls");
+                printf("Buscar: ");
+                fflush(stdin);
+                gets(&dato);
+                control = encuentraNombreApellido(bufferArch, dato);
+                if (control != 0 && cliente.bajaCliente == 1)
+                {
+                    rewind(bufferArch);
+                    fread(&cliente, sizeof(stCliente), control, bufferArch);
+                    mostrarCliente(cliente);
+                }
+                else
+                {
+                    printf("No se encontro al cliente\n");
+                }
+                system("pause");
+                break;
+
+            //Busca domicilio
+            case '2':
+                system("cls");
+                printf("Buscar: ");
+                fflush(stdin);
+                gets(&dato);
+                control = encuentraDomicilio(bufferArch, dato);
+                if (control != 0 && cliente.bajaCliente == 1)
+                {
+                    rewind(bufferArch);
+                    fread(&cliente, sizeof(stCliente), control, bufferArch);
+                    mostrarCliente(cliente);
+                }
+                else
+                {
+                    printf("No se encontro al cliente\n");
+                }
+                system("pause");
+                break;
+
+            //Busca telefono
+            case '3':
+                system("cls");
+                printf("Buscar: ");
+                fflush(stdin);
+                gets(&dato);
+                control = encuentraTelefono(bufferArch, dato);
+                if (control != 0 && cliente.bajaCliente == 1)
+                {
+                    rewind(bufferArch);
+                    fread(&cliente, sizeof(stCliente), control, bufferArch);
+                    mostrarCliente(cliente);
+                }
+                else
+                {
+                    printf("No se encontro al cliente\n");
+                }
+                system("pause");
+                break;
+
+            //Busca email
+            case '4':
+                system("cls");
+                printf("Buscar: ");
+                fflush(stdin);
+                gets(&dato);
+                control = encuentraEmail(bufferArch, dato);
+                if (control != 0 && cliente.bajaCliente == 1)
+                {
+                    rewind(bufferArch);
+                    fseek(bufferArch,control-sizeof(stCliente), SEEK_CUR);
+                    fread(&cliente, sizeof(stCliente), 1, bufferArch);
+                    mostrarCliente(cliente);
+                }
+                else
+                {
+                    printf("No se encontro al cliente o esta dado de baja\n");
+                }
+                system("pause");
+                break;
+            }
+        }
+        while (opcion != '0');
+    }
+    else
+    {
+        printf("Error al abrir el archivo");
+    }
+    fclose(bufferArch);
+
+}
+
 int encuentraCliente (char nombreArchivo[], char dato[])  //Busca si existe un cliente en base a su email.
 {
     int ctrl=0;
@@ -345,6 +590,92 @@ int encuentraCliente (char nombreArchivo[], char dato[])  //Busca si existe un c
         fclose(archi);
     }
 
+    return ctrl;
+}
+
+int encuentraNombreApellido (char nombreArchivo[], char dato[])
+{
+    int ctrl=0;
+    stCliente cliente;
+    rewind(nombreArchivo);
+
+    rewind(nombreArchivo);
+    while (fread(&cliente, sizeof(stCliente), 1, nombreArchivo) > 0 && ctrl == 0)
+    {
+        if (strcmpi(cliente.nombreApellido, dato) == 0)
+        {
+            ctrl=ftell(nombreArchivo)/ sizeof(stCliente);
+        }
+    }
+    return ctrl;
+}
+
+int encuentraEmail (char nombreArchivo[], char dato[])
+{
+    int ctrl=0;
+    stCliente cliente;
+    rewind(nombreArchivo);
+
+    while (fread(&cliente, sizeof(stCliente), 1, nombreArchivo) > 0 && ctrl == 0)
+    {
+        if (strcmpi(cliente.email, dato) == 0)
+        {
+            ctrl=ftell(nombreArchivo)/ sizeof(stCliente);
+        }
+    }
+    return ctrl;
+}
+
+int encuentraPassword (FILE * arch, int dato[], int cant)
+{
+    int ctrl=0;
+    int i=0;
+    stCliente cliente;
+    fseek(arch, -1*sizeof(stCliente), SEEK_CUR);
+
+    while (fread(&cliente, sizeof(stCliente), 1, arch) > 0 && ctrl==0)
+    {
+        while (cliente.password == dato[i] && i<cant)
+        {
+            i++;
+        }
+        if (i == cant)
+        {
+            ctrl=ftell(arch)/ sizeof(stCliente);
+        }
+    }
+    return ctrl;
+}
+
+int encuentraDomicilio (char nombreArchivo[], char dato[])
+{
+    int ctrl=0;
+    stCliente cliente;
+    rewind(nombreArchivo);
+
+    while (fread(&cliente, sizeof(stCliente), 1, nombreArchivo) > 0 && ctrl == 0)
+    {
+        if (strcmpi(cliente.domicilio, dato) == 0)
+        {
+            ctrl=ftell(nombreArchivo)/ sizeof(stCliente);
+        }
+    }
+    return ctrl;
+}
+
+int encuentraTelefono (char nombreArchivo[], char dato[])
+{
+    int ctrl=0;
+    stCliente cliente;
+    rewind(nombreArchivo);
+
+    while (fread(&cliente, sizeof(stCliente), 1, nombreArchivo) > 0 && ctrl == 0)
+    {
+        if (strcmpi(cliente.telefono, dato) == 0)
+        {
+            ctrl=ftell(nombreArchivo)/ sizeof(stCliente);
+        }
+    }
     return ctrl;
 }
 
@@ -555,7 +886,7 @@ void mostrarClientes(char nombreArchivo[])  //Muestra todos los clientes en un a
     }
 }
 
-void mostrarPedidos(char nombreArchivo[])  //Muestra todos los pedidos en un archivo.
+void mostrarPedidos(char nombreArchivo[], int idClint)  //Muestra todos los pedidos en un archivo.
 {
     FILE * arch;
     stPedido aux;
@@ -566,7 +897,7 @@ void mostrarPedidos(char nombreArchivo[])  //Muestra todos los pedidos en un arc
     {
         while(fread(&aux,sizeof(stPedido),1,arch)>0)
         {
-            if(aux.pedidoAnulado == 1)
+            if(aux.pedidoAnulado == 1 && idClint == aux.idCliente)
             {
                 mostrarPedido(aux);
             }
