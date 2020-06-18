@@ -92,11 +92,13 @@ float totalCarrito(stProducto carro[], int cantProd);  //Cuenta el total del car
 
 void llenarCarrito(char nombreArchivo[], stProducto carro[], int idProd, int cantProd); //Carga el carrito de compras con productos.
 
-void encriptarPass(char password[], int encript[],int col);
+void encriptarPass(char password[], int encript[]); //Encripta una contraseña.
 
-void multMatrices(int col, int M1[3][3], int M2[3][col], int M3[3][col]);
+void multMatrices(int col, int M1[3][3], int M2[3][col], int M3[3][col]); //Multiplica dos matrices.
 
-void pasarArrayMatriz (int fil, int col, int mat[fil][col],char contrasena[]);
+void pasarArrayMatriz (int fil, int col, int mat[fil][col],char contrasena[]);  //Pasa un array de char a una matriz de int.
+
+void pasarMatrizArray(int fil, int col, int mat[fil][col], int a[]); //Pasa una matriz de int a un array de int.
 
 //////////////////////////////Funciones de Muestra//////////////////////////////////////
 void mostrarCliente(stCliente client); //Muestra un cliente, con formato.
@@ -210,8 +212,7 @@ int menuLogin (stCliente * clienteLoged, char nombreArchivo[])
         scanf("%s", &email);
         /*printf("Contrase%ca: ", 164);
         scanf("%s", &password);
-        cant = 1 + (strlen(password) / 3);
-        encriptarPass(password, passEncr, cant);*/
+        encriptarPass(password, passEncr);*/
 
         fEmail = encuentraEmail(arch, email);
         //fPass = encuentraPassword(arch, passEncr, cant*3);
@@ -220,7 +221,7 @@ int menuLogin (stCliente * clienteLoged, char nombreArchivo[])
         {
             control = 1;
             rewind(arch);
-            fseek(arch, fEmail-sizeof(stCliente), SEEK_CUR);
+            fseek(arch, -1*sizeof(stCliente), SEEK_CUR);
             fread(clienteLoged, sizeof(stCliente), 1, arch);
         }
     }
@@ -372,9 +373,8 @@ void crearCliente(char nombreArchivo[])  //Ingresa los datos por teclado los dat
     printf("Contrase%ca: ",164);
     fflush(stdin);
     scanf("%s", &pass);
-    cant = 1 + (strlen(pass) / 3);
 
-    encriptarPass(pass, client.password, cant);
+    encriptarPass(pass, client.password);
 
     client.idCliente = contadorDatos(nombreArchivo, sizeof(stCliente)) + 1;
     printf("%d \n", client.idCliente);
@@ -857,33 +857,27 @@ void llenarCarrito(char nombreArchivo[], stProducto carro[], int idProd, int can
     }
 }
 
-void encriptarPass(char password[], int encript[],int col)
-{
-    int i,j,k=0;
+void encriptarPass(char password[], int passEncript[]) //Ingresa una contraseña y la encripta mediante matrices
+{                                                              //Devuelve una array de int como resultado.
+    int fil = 3;
+    int col = 10;
     int codigo[3][3]=
     {
         {1,2,3},
         {0,1,2},
         {2,1,1},
     };
-    int matriz[3][col];
-    int encrip[3][col];
+    int matriz[fil][col];
+    int encrip[fil][col];
 
-    pasarArrayMatriz(3,col,matriz,password);
+    pasarArrayMatriz(fil,col,matriz,password);
 
     multMatrices(col,codigo,matriz,encrip);
 
-    for(j = 0; j < col; j++)
-    {
-        for(i=0; i < 3; i++)
-        {
-            encript[k] = encrip[i][j];
-            k++;
-        }
-    }
+    pasarMatrizArray(fil,col,encrip,passEncript);
 }
 
-void multMatrices(int col, int M1[3][3], int M2[3][col], int M3[3][col])
+void multMatrices(int col, int M1[3][3], int M2[3][col], int M3[3][col]) //Multiplica dos matrices.
 {
     int i,j,k;
     int aux = 0;
@@ -902,7 +896,7 @@ void multMatrices(int col, int M1[3][3], int M2[3][col], int M3[3][col])
     }
 }
 
-void pasarArrayMatriz (int fil, int col, int mat[fil][col],char contrasena[])
+void pasarArrayMatriz (int fil, int col, int mat[fil][col],char contrasena[]) //Pasa un array de char a una matriz de enteros.
 {
     int i,j,k=0;
 
@@ -919,6 +913,20 @@ void pasarArrayMatriz (int fil, int col, int mat[fil][col],char contrasena[])
                 mat[i][j] = contrasena[k];
                 k++;
             }
+        }
+    }
+}
+
+void pasarMatrizArray(int fil, int col, int mat[fil][col], int a[]) //Pasa una matriz de enteros a un array.
+{
+    int i,j,k=0;
+
+    for(j = 0; j < col; j++)
+    {
+        for(i=0; i < 3; i++)
+        {
+            a[k] = mat[i][j];
+            k++;
         }
     }
 }
