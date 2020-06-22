@@ -552,11 +552,12 @@ void busquedaCliente (stCliente cliente, char nombreArchivo[]) //Funcion princip
                 printf("Buscar: ");
                 fflush(stdin);
                 gets(&dato);
-                control = encuentraNombreApellido(bufferArch, dato);
-                if (control != 0 && cliente.bajaCliente == 1)
+                pos = encuentraNombreApellido(bufferArch, dato) - 1;
+                if (pos != 0 && cliente.bajaCliente == 1)
                 {
                     rewind(bufferArch);
-                    fread(&cliente, sizeof(stCliente), control, bufferArch);
+                    fseek(bufferArch, pos*sizeof(stCliente),SEEK_SET);
+                    fread(&cliente, sizeof(stCliente), 1, bufferArch);
                     mostrarCliente(cliente);
                 }
                 else
@@ -572,11 +573,12 @@ void busquedaCliente (stCliente cliente, char nombreArchivo[]) //Funcion princip
                 printf("Buscar: ");
                 fflush(stdin);
                 gets(&dato);
-                control = encuentraDomicilio(bufferArch, dato);
-                if (control != 0 && cliente.bajaCliente == 1)
+                pos = encuentraDomicilio(bufferArch, dato) - 1;
+                if (pos != 0 && cliente.bajaCliente == 1)
                 {
                     rewind(bufferArch);
-                    fread(&cliente, sizeof(stCliente), control, bufferArch);
+                    fseek(bufferArch, pos*sizeof(stCliente),SEEK_SET);
+                    fread(&cliente, sizeof(stCliente), 1, bufferArch);
                     mostrarCliente(cliente);
                 }
                 else
@@ -592,11 +594,12 @@ void busquedaCliente (stCliente cliente, char nombreArchivo[]) //Funcion princip
                 printf("Buscar: ");
                 fflush(stdin);
                 gets(&dato);
-                control = encuentraTelefono(bufferArch, dato);
-                if (control != 0 && cliente.bajaCliente == 1)
+                pos = encuentraTelefono(bufferArch, dato) - 1;
+                if (pos != 0 && cliente.bajaCliente == 1)
                 {
                     rewind(bufferArch);
-                    fread(&cliente, sizeof(stCliente), control, bufferArch);
+                    fseek(bufferArch, pos*sizeof(stCliente),SEEK_SET);
+                    fread(&cliente, sizeof(stCliente), 1, bufferArch);
                     mostrarCliente(cliente);
                 }
                 else
@@ -612,11 +615,11 @@ void busquedaCliente (stCliente cliente, char nombreArchivo[]) //Funcion princip
                 printf("Buscar: ");
                 fflush(stdin);
                 gets(&dato);
-                control = encuentraEmail(bufferArch, dato);
-                if (control != 0 && cliente.bajaCliente == 1)
+                pos = encuentraEmail(bufferArch, dato) - 1;
+                if (pos != 0 && cliente.bajaCliente == 1)
                 {
                     rewind(bufferArch);
-                    fseek(bufferArch,control-sizeof(stCliente), SEEK_CUR);
+                    fseek(bufferArch, pos*sizeof(stCliente),SEEK_SET);
                     fread(&cliente, sizeof(stCliente), 1, bufferArch);
                     mostrarCliente(cliente);
                 }
