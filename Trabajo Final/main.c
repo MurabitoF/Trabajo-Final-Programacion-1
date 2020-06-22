@@ -47,6 +47,8 @@ int menuLogin (stCliente * clienteLog, char nombreArchivo[]);
 
 void menuPrincipal(stCliente clientLoged);
 
+void menuOpciones(stCliente clientLoged);
+
 //////////////////////////////Funciones de Carga/////////////////////////////////////////////
 void crearCliente(char nombreArchivo[]);  //Ingresa los datos por teclado los datos para crear un cliente.
 
@@ -241,6 +243,7 @@ void menuPrincipal(stCliente clientLoged)
     do
     {
         system("cls");
+        logo();
         printf("Bienvenido %s\n\n", clientLoged.nombreApellido);
         printf("1. Hacer un pedido\n");
         printf("2. Mis Pedidos\n");
@@ -263,6 +266,7 @@ void menuPrincipal(stCliente clientLoged)
         {
         case 1:
             system("cls");
+            logo();
             cant = 0;
             mostrarProductos(aProductos);
             printf("Presione 0 para finalizar el pedido\n");
@@ -300,15 +304,19 @@ void menuPrincipal(stCliente clientLoged)
 
             break;
         case 4:
-            //menuOpciones(clientLoged);
+            menuOpciones(clientLoged);
             break;
         case 5:
+            logo();
             mostrarClientes(aClientes);
+            system("pause");
             break;
         case 6:
+            logo();
             busquedaCliente(clientLoged, aClientes);
             break;
         case 7:
+            logo();
             mostrarProductos(aProductos);
             printf("\nQuiere agregar un producto nuevo? s/n\n");
             fflush(stdin);
@@ -317,15 +325,58 @@ void menuPrincipal(stCliente clientLoged)
                 crearProducto(aProductos);
             break;
         case 8:
+            logo();
             mostrarPedidos(aPedidos);
             break;
         case 9:
+            logo();
             printf("Ingrese el id de un cliente");
             scanf("%d", &idClint);
             buscaPedidoIdCliente(idClint, aPedidos);
         }
     }
     while(op != 0);
+}
+
+void menuOpciones(stCliente clientLoged)
+{
+    int op = 0;
+    char baja = 0;
+
+    do
+    {
+        system("cls");
+        logo();
+        printf("\n1. Mis Datos\n");
+        printf("2. Dar de baja\n");
+        printf("0. Salir\n");
+        printf("Ingrese su opcion: ");
+        scanf("%d",&op);
+
+        switch(op)
+        {
+        case 1:
+            system("cls");
+            logo();
+            printf("\nSus datos son los siguientes: \n");
+            mostrarCliente(clientLoged);
+            system("pause");
+            //funcion de modificar
+            break;
+        case 2:
+            system("cls");
+            logo();
+            printf("\nEsta seguro de dar de baja? s/n");
+            fflush(stdin);
+            scanf("%c", &baja);
+            if(baja == 's')
+            {
+                //funcion dar de baja;
+            }
+            break;
+        }
+
+    }while(op != 0);
 }
 
 //////////////////////////////Funciones de Carga/////////////////////////////////////////////
