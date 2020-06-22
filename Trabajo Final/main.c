@@ -113,9 +113,9 @@ void mostrarPedidos(char nombreArchivo[]);  //Muestra todos los pedidos en un ar
 
 void mostrarProductos(char nombreArchivo[]); //Muestra todos los productos en un archivo.
 
-const char aClientes[] = {"clientes.dat"};
-const char aPedidos[] = {"pedidos.dat"};
-const char aProductos[] = {"productos.dat"};
+const char aClientes[] = {"Datos\\clientes.dat"};
+const char aPedidos[] = {"Datos\\pedidos.dat"};
+const char aProductos[] = {"Datos\\productos.dat"};
 
 int main()
 {
@@ -131,8 +131,9 @@ int main()
         {
         case '1':
             system("cls");
-            if (menuLogin(&clienteLoged, aClientes) == 1)
+            if (menuLogin(&clienteLoged, aClientes))
             {
+
                 menuPrincipal(clienteLoged);
             }
             else
@@ -201,7 +202,7 @@ int menuLogin (stCliente * clienteLoged, char nombreArchivo[])
     char email[40];
     char password[30] = {0};
 
-    int cant;
+    int cant = 0;
     int control = 0;
     int fEmail = 0, fPass = 0;
     int passEncr[30] = {0};
@@ -210,18 +211,19 @@ int menuLogin (stCliente * clienteLoged, char nombreArchivo[])
     {
         printf("Email: ");
         scanf("%s", &email);
-        /*printf("Contrase%ca: ", 164);
+        printf("Contrase%ca: ", 164);
         scanf("%s", &password);
-        encriptarPass(password, passEncr);*/
+        cant = strlen(password);
+        encriptarPass(password, passEncr);
 
         fEmail = encuentraEmail(arch, email);
-        //fPass = encuentraPassword(arch, passEncr, cant*3);
+        fseek(arch, -2*sizeof(stCliente), SEEK_CUR);
+        fPass = encuentraPassword(arch, passEncr, cant);
 
-        if (fEmail != 0 /*&& fPass != 0*/)
+        if (fEmail != 0 && fPass != 0)
         {
             control = 1;
-            rewind(arch);
-            fseek(arch, -1*sizeof(stCliente), SEEK_CUR);
+            fseek(arch, -2*sizeof(stCliente), SEEK_CUR);
             fread(clienteLoged, sizeof(stCliente), 1, arch);
         }
     }
@@ -231,7 +233,7 @@ int menuLogin (stCliente * clienteLoged, char nombreArchivo[])
 
 void menuPrincipal(stCliente clientLoged)
 {
-    int i,op=0,cant=0;
+    int i,op=0,cant=0,men=0;
     char menu;
     stProducto carrito[20];
     int idClint;
@@ -261,16 +263,21 @@ void menuPrincipal(stCliente clientLoged)
         {
         case 1:
             system("cls");
+            cant = 0;
             mostrarProductos(aProductos);
+            printf("Presione 0 para finalizar el pedido\n");
             do
             {
                 printf("Menu: ");
-                scanf("%d", &menu);
-                llenarCarrito(aProductos,carrito,op,cant);
+                scanf("%d", &men);
+                if(men > 0)
+                {
+                    llenarCarrito(aProductos,carrito,men,cant);
+                }
                 cant++;
 
             }
-            while(menu != 0);
+            while(men != 0);
             printf("Su Pedido es: \n");
 
             for(i = 0; i < cant-1; i++)
@@ -282,7 +289,7 @@ void menuPrincipal(stCliente clientLoged)
             scanf("%c",&menu);
             if(menu == 's')
             {
-                crearPedido(aPedidos, carrito, cant-1,1);
+                crearPedido(aPedidos, carrito, cant-1,clientLoged.idCliente);
             }
             break;
         case 2:
@@ -590,7 +597,7 @@ int encuentraCliente (char nombreArchivo[], char dato[])  //Busca si existe un c
 
     if(archi != NULL)
     {
-        while (fread(&cliente, sizeof(stCliente), 1, archi) > 0 && !ctrl)
+        while (fread(&cliente, sizeof(stCliente), 1, archi) > 0 && ctrl == 0)
         {
             if (strcmpi(cliente.email, dato) == 0)
             {
@@ -641,11 +648,10 @@ int encuentraPassword (FILE * arch, int dato[], int cant)
     int ctrl=0;
     int i=0;
     stCliente cliente;
-    fseek(arch, -1*sizeof(stCliente), SEEK_CUR);
 
-    while (fread(&cliente, sizeof(stCliente), 1, arch) > 0 && ctrl==0)
+    while (fread(&cliente, sizeof(stCliente), 1, arch) > 0 && ctrl == 0)
     {
-        while (cliente.password == dato[i] && i<cant)
+        while (cliente.password[i] == dato[i] && i<cant)
         {
             i++;
         }
