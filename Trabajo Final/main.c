@@ -92,11 +92,13 @@ float totalCarrito(stProducto carro[], int cantProd);  //Cuenta el total del car
 
 void llenarCarrito(char nombreArchivo[], stProducto carro[], int idProd, int cantProd); //Carga el carrito de compras con productos.
 
-void encriptarPass(char password[], int encript[],int col);
+void encriptarPass(char password[], int encript[]); //Encripta una contraseña.
 
-void multMatrices(int col, int M1[3][3], int M2[3][col], int M3[3][col]);
+void multMatrices(int col, int M1[3][3], int M2[3][col], int M3[3][col]); //Multiplica dos matrices.
 
-void pasarArrayMatriz (int fil, int col, int mat[fil][col],char contrasena[]);
+void pasarArrayMatriz (int fil, int col, int mat[fil][col],char contrasena[]);  //Pasa un array de char a una matriz de int.
+
+void pasarMatrizArray(int fil, int col, int mat[fil][col], int a[]); //Pasa una matriz de int a un array de int.
 
 //////////////////////////////Funciones de Muestra//////////////////////////////////////
 void mostrarCliente(stCliente client); //Muestra un cliente, con formato.
@@ -111,9 +113,9 @@ void mostrarPedidos(char nombreArchivo[]);  //Muestra todos los pedidos en un ar
 
 void mostrarProductos(char nombreArchivo[]); //Muestra todos los productos en un archivo.
 
-const char aClientes[] = {"clientes.dat"};
-const char aPedidos[] = {"pedidos.dat"};
-const char aProductos[] = {"productos.dat"};
+const char aClientes[] = {"Datos\\clientes.dat"};
+const char aPedidos[] = {"Datos\\pedidos.dat"};
+const char aProductos[] = {"Datos\\productos.dat"};
 
 int main()
 {
@@ -129,8 +131,9 @@ int main()
         {
         case '1':
             system("cls");
-            if (menuLogin(&clienteLoged, aClientes) == 1)
+            if (menuLogin(&clienteLoged, aClientes))
             {
+
                 menuPrincipal(clienteLoged);
             }
             else
@@ -199,7 +202,7 @@ int menuLogin (stCliente * clienteLoged, char nombreArchivo[])
     char email[40];
     char password[30] = {0};
 
-    int cant;
+    int cant = 0;
     int control = 0;
     int fEmail = 0, fPass = 0;
     int passEncr[30] = {0};
@@ -208,19 +211,19 @@ int menuLogin (stCliente * clienteLoged, char nombreArchivo[])
     {
         printf("Email: ");
         scanf("%s", &email);
-        /*printf("Contrase%ca: ", 164);
+        printf("Contrase%ca: ", 164);
         scanf("%s", &password);
-        cant = 1 + (strlen(password) / 3);
-        encriptarPass(password, passEncr, cant);*/
+        cant = strlen(password);
+        encriptarPass(password, passEncr);
 
         fEmail = encuentraEmail(arch, email);
-        //fPass = encuentraPassword(arch, passEncr, cant*3);
+        fseek(arch, -2*sizeof(stCliente), SEEK_CUR);
+        fPass = encuentraPassword(arch, passEncr, cant);
 
-        if (fEmail != 0 /*&& fPass != 0*/)
+        if (fEmail != 0 && fPass != 0)
         {
             control = 1;
-            rewind(arch);
-            fseek(arch, fEmail-sizeof(stCliente), SEEK_CUR);
+            fseek(arch, -2*sizeof(stCliente), SEEK_CUR);
             fread(clienteLoged, sizeof(stCliente), 1, arch);
         }
     }
@@ -230,7 +233,7 @@ int menuLogin (stCliente * clienteLoged, char nombreArchivo[])
 
 void menuPrincipal(stCliente clientLoged)
 {
-    int i,op=0,cant=0;
+    int i,op=0,cant=0,men=0;
     char menu;
     stProducto carrito[20];
     int idClint;
@@ -260,16 +263,21 @@ void menuPrincipal(stCliente clientLoged)
         {
         case 1:
             system("cls");
+            cant = 0;
             mostrarProductos(aProductos);
+            printf("Presione 0 para finalizar el pedido\n");
             do
             {
                 printf("Menu: ");
-                scanf("%d", &menu);
-                llenarCarrito(aProductos,carrito,op,cant);
+                scanf("%d", &men);
+                if(men > 0)
+                {
+                    llenarCarrito(aProductos,carrito,men,cant);
+                }
                 cant++;
 
             }
-            while(menu != 0);
+            while(men != 0);
             printf("Su Pedido es: \n");
 
             for(i = 0; i < cant-1; i++)
@@ -281,7 +289,7 @@ void menuPrincipal(stCliente clientLoged)
             scanf("%c",&menu);
             if(menu == 's')
             {
-                crearPedido(aPedidos, carrito, cant-1,1);
+                crearPedido(aPedidos, carrito, cant-1,clientLoged.idCliente);
             }
             break;
         case 2:
@@ -296,6 +304,7 @@ void menuPrincipal(stCliente clientLoged)
             break;
         case 5:
             mostrarClientes(aClientes);
+            system("pause");
             break;
         case 6:
             busquedaCliente(clientLoged, aClientes);
@@ -372,9 +381,8 @@ void crearCliente(char nombreArchivo[])  //Ingresa los datos por teclado los dat
     printf("Contrase%ca: ",164);
     fflush(stdin);
     scanf("%s", &pass);
-    cant = 1 + (strlen(pass) / 3);
 
-    encriptarPass(pass, client.password, cant);
+    encriptarPass(pass, client.password);
 
     client.idCliente = contadorDatos(nombreArchivo, sizeof(stCliente)) + 1;
     printf("%d \n", client.idCliente);
@@ -471,7 +479,7 @@ void busquedaCliente (stCliente cliente, char nombreArchivo[]) //Funcion princip
 {
     char dato[60];
     char opcion;
-    int control = 0;
+    int pos = 0;
     char modific;
 
     FILE * bufferArch = fopen(nombreArchivo, "rb");
@@ -480,7 +488,7 @@ void busquedaCliente (stCliente cliente, char nombreArchivo[]) //Funcion princip
     {
         do
         {
-            control = 0;
+            pos = 0;
             rewind(bufferArch);
             system("cls");
             menuBuscaCliente();
@@ -494,11 +502,12 @@ void busquedaCliente (stCliente cliente, char nombreArchivo[]) //Funcion princip
                 printf("Buscar: ");
                 fflush(stdin);
                 gets(&dato);
-                control = encuentraNombreApellido(bufferArch, dato);
-                if (control != 0 && cliente.bajaCliente == 1)
+                pos = encuentraNombreApellido(bufferArch, dato) - 1;
+                if (pos != 0 && cliente.bajaCliente == 1)
                 {
                     rewind(bufferArch);
-                    fread(&cliente, sizeof(stCliente), control, bufferArch);
+                    fseek(bufferArch, pos*sizeof(stCliente),SEEK_SET);
+                    fread(&cliente, sizeof(stCliente), 1, bufferArch);
                     mostrarCliente(cliente);
                 }
                 else
@@ -514,11 +523,12 @@ void busquedaCliente (stCliente cliente, char nombreArchivo[]) //Funcion princip
                 printf("Buscar: ");
                 fflush(stdin);
                 gets(&dato);
-                control = encuentraDomicilio(bufferArch, dato);
-                if (control != 0 && cliente.bajaCliente == 1)
+                pos = encuentraDomicilio(bufferArch, dato) - 1;
+                if (pos != 0 && cliente.bajaCliente == 1)
                 {
                     rewind(bufferArch);
-                    fread(&cliente, sizeof(stCliente), control, bufferArch);
+                    fseek(bufferArch, pos*sizeof(stCliente),SEEK_SET);
+                    fread(&cliente, sizeof(stCliente), 1, bufferArch);
                     mostrarCliente(cliente);
                 }
                 else
@@ -534,11 +544,12 @@ void busquedaCliente (stCliente cliente, char nombreArchivo[]) //Funcion princip
                 printf("Buscar: ");
                 fflush(stdin);
                 gets(&dato);
-                control = encuentraTelefono(bufferArch, dato);
-                if (control != 0 && cliente.bajaCliente == 1)
+                pos = encuentraTelefono(bufferArch, dato) - 1;
+                if (pos != 0 && cliente.bajaCliente == 1)
                 {
                     rewind(bufferArch);
-                    fread(&cliente, sizeof(stCliente), control, bufferArch);
+                    fseek(bufferArch, pos*sizeof(stCliente),SEEK_SET);
+                    fread(&cliente, sizeof(stCliente), 1, bufferArch);
                     mostrarCliente(cliente);
                 }
                 else
@@ -554,11 +565,11 @@ void busquedaCliente (stCliente cliente, char nombreArchivo[]) //Funcion princip
                 printf("Buscar: ");
                 fflush(stdin);
                 gets(&dato);
-                control = encuentraEmail(bufferArch, dato);
-                if (control != 0 && cliente.bajaCliente == 1)
+                pos = encuentraEmail(bufferArch, dato) - 1;
+                if (pos != 0 && cliente.bajaCliente == 1)
                 {
                     rewind(bufferArch);
-                    fseek(bufferArch,control-sizeof(stCliente), SEEK_CUR);
+                    fseek(bufferArch, pos*sizeof(stCliente),SEEK_SET);
                     fread(&cliente, sizeof(stCliente), 1, bufferArch);
                     mostrarCliente(cliente);
                 }
@@ -590,7 +601,7 @@ int encuentraCliente (char nombreArchivo[], char dato[])  //Busca si existe un c
 
     if(archi != NULL)
     {
-        while (fread(&cliente, sizeof(stCliente), 1, archi) > 0 && !ctrl)
+        while (fread(&cliente, sizeof(stCliente), 1, archi) > 0 && ctrl == 0)
         {
             if (strcmpi(cliente.email, dato) == 0)
             {
@@ -609,7 +620,6 @@ int encuentraNombreApellido (char nombreArchivo[], char dato[])
     stCliente cliente;
     rewind(nombreArchivo);
 
-    rewind(nombreArchivo);
     while (fread(&cliente, sizeof(stCliente), 1, nombreArchivo) > 0 && ctrl == 0)
     {
         if (strcmpi(cliente.nombreApellido, dato) == 0)
@@ -641,11 +651,10 @@ int encuentraPassword (FILE * arch, int dato[], int cant)
     int ctrl=0;
     int i=0;
     stCliente cliente;
-    fseek(arch, -1*sizeof(stCliente), SEEK_CUR);
 
-    while (fread(&cliente, sizeof(stCliente), 1, arch) > 0 && ctrl==0)
+    while (fread(&cliente, sizeof(stCliente), 1, arch) > 0 && ctrl == 0)
     {
-        while (cliente.password == dato[i] && i<cant)
+        while (cliente.password[i] == dato[i] && i<cant)
         {
             i++;
         }
@@ -754,16 +763,14 @@ void buscaPedidoIdCliente (int idCliente, char nombreArchivo[])
                     fflush(stdin);
                     control = getch();
                 }
-                else
-                {
-                    system("cls");
-                    printf("El cliente no tiene pedidos");
-                    printf("Desea continuar? s/n");
-                    fflush(stdin);
-                    control = getch();
-                }
+            }else
+            {
+                system("cls");
+                printf("El cliente no tiene pedidos");
+                printf("Desea continuar? s/n");
+                fflush(stdin);
+                control = getch();
             }
-
         }
         while (control == 's');
     }
@@ -857,33 +864,27 @@ void llenarCarrito(char nombreArchivo[], stProducto carro[], int idProd, int can
     }
 }
 
-void encriptarPass(char password[], int encript[],int col)
-{
-    int i,j,k=0;
+void encriptarPass(char password[], int passEncript[]) //Ingresa una contraseña y la encripta mediante matrices
+{                                                              //Devuelve una array de int como resultado.
+    int fil = 3;
+    int col = 10;
     int codigo[3][3]=
     {
         {1,2,3},
         {0,1,2},
         {2,1,1},
     };
-    int matriz[3][col];
-    int encrip[3][col];
+    int matriz[fil][col];
+    int encrip[fil][col];
 
-    pasarArrayMatriz(3,col,matriz,password);
+    pasarArrayMatriz(fil,col,matriz,password);
 
     multMatrices(col,codigo,matriz,encrip);
 
-    for(j = 0; j < col; j++)
-    {
-        for(i=0; i < 3; i++)
-        {
-            encript[k] = encrip[i][j];
-            k++;
-        }
-    }
+    pasarMatrizArray(fil,col,encrip,passEncript);
 }
 
-void multMatrices(int col, int M1[3][3], int M2[3][col], int M3[3][col])
+void multMatrices(int col, int M1[3][3], int M2[3][col], int M3[3][col]) //Multiplica dos matrices.
 {
     int i,j,k;
     int aux = 0;
@@ -902,7 +903,7 @@ void multMatrices(int col, int M1[3][3], int M2[3][col], int M3[3][col])
     }
 }
 
-void pasarArrayMatriz (int fil, int col, int mat[fil][col],char contrasena[])
+void pasarArrayMatriz (int fil, int col, int mat[fil][col],char contrasena[]) //Pasa un array de char a una matriz de enteros.
 {
     int i,j,k=0;
 
@@ -919,6 +920,20 @@ void pasarArrayMatriz (int fil, int col, int mat[fil][col],char contrasena[])
                 mat[i][j] = contrasena[k];
                 k++;
             }
+        }
+    }
+}
+
+void pasarMatrizArray(int fil, int col, int mat[fil][col], int a[]) //Pasa una matriz de enteros a un array.
+{
+    int i,j,k=0;
+
+    for(j = 0; j < col; j++)
+    {
+        for(i=0; i < 3; i++)
+        {
+            a[k] = mat[i][j];
+            k++;
         }
     }
 }
