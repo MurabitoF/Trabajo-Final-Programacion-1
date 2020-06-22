@@ -811,7 +811,8 @@ void buscaPedidoIdCliente (int idCliente, char nombreArchivo[])
                     fflush(stdin);
                     control = getch();
                 }
-                else
+            }
+            else
                 {
                     system("cls");
                     printf("El cliente no tiene pedidos");
@@ -819,8 +820,6 @@ void buscaPedidoIdCliente (int idCliente, char nombreArchivo[])
                     fflush(stdin);
                     control = getch();
                 }
-            }
-
         }
         while (control == 's');
     }
