@@ -115,6 +115,12 @@ void mostrarPedidos(char nombreArchivo[]);  //Muestra todos los pedidos en un ar
 
 void mostrarProductos(char nombreArchivo[]); //Muestra todos los productos en un archivo.
 
+////////////////////////////Funciones de Modificacion////////////////////////// ¿Esta bien el apartado?
+void modificarPedido (stPedido pedido, stCliente cliente, char nombreArchivo[]); //Compila, no se si tira errores
+
+void ModificarClienteV2(stCliente cliente, char nombreArchivo[]); //Compila, no se si tira errores
+
+void bajaCliente (stCliente cliente, char nombreArchivo[]); //Compila, no se si tira errores
 const char aClientes[] = {"Datos\\clientes.dat"};
 const char aPedidos[] = {"Datos\\pedidos.dat"};
 const char aProductos[] = {"Datos\\productos.dat"};
@@ -529,7 +535,7 @@ void busquedaCliente (stCliente cliente, char nombreArchivo[]) //Funcion princip
 {
     char dato[60];
     char opcion;
-    int control = 0;
+    int pos = 0;
     char modific;
 
     FILE * bufferArch = fopen(nombreArchivo, "rb");
@@ -538,7 +544,7 @@ void busquedaCliente (stCliente cliente, char nombreArchivo[]) //Funcion princip
     {
         do
         {
-            control = 0;
+            pos = 0;
             rewind(bufferArch);
             system("cls");
             menuBuscaCliente();
@@ -1086,7 +1092,133 @@ void mostrarProductos(char nombreArchivo[]) //Muestra todos los productos en un 
         fclose(arch);
     }
 }
+void ModificarClienteV2(stCliente cliente, char nombreArchivo[])
+{
+    char sON;
+    int menu;
+    stCliente aux;
+    aux = cliente;
+    FILE * archi=NULL;
+    archi = fopen(nombreArchivo,"r+b");
+printf(" Desea modificar sus datos? s/n: ");
+fflush(stdin);
+scanf("%c",&sON);
+if (sON=='s') {
+        do {
 
+    printf("\n 1 nombre y apellido\n  2 Domicilio\n  3 telefono\n  4 mail\n 5 contrasena \n 0 Terminar de modificar los datos\n");
+scanf("%d",&menu);
+fflush(stdin);
+
+    switch (menu)
+    {
+case 1:
+    printf(" ingrese nuevo nombre y apellido\n");
+    fflush(stdin);
+    gets(aux.nombreApellido);
+    break;
+case 2:
+    printf("ingrese nuevo Domicilio\n");
+    gets(aux.domicilio);
+    break;
+case 3:
+    printf(" ingrese nuevo telefono\n");
+    gets(aux.telefono);
+    break;
+case 4:
+    printf(" ingrese nuevo mail\n");
+    gets(aux.email);
+    break;
+case 5:
+    printf("ingrse nueva contraseña");
+    gets(aux.password);
+    break;
+case 0:
+    printf("\n");
+    break;
+}
+
+
+} while (menu!=0);
+printf("Sus nuevos datos son los siguientes: \n");
+mostrarCliente(aux);
+printf("\n desea guardar los cambios? s/n");
+scanf("%c",&sON);
+if (sON=='s') {
+        printf("Los cambios han sido guardados\n");
+     fseek(archi,-1 * sizeof(stCliente), SEEK_CUR);
+ fwrite(&aux, sizeof(stCliente),1, archi);
+
+} else {
+printf("Los cambios han sido descartados.\n");
+}
+fclose(archi);
+}
+}
+void bajaCliente (stCliente cliente, char nombreArchivo[])
+{ stCliente aux;
+aux = cliente;
+char sON,sON2;
+ FILE * archi=NULL;
+    archi = fopen(nombreArchivo,"r+b");
+    printf("Desea dar de baja la cuenta registrada a nombre de %c s/n ?",aux.nombreApellido);
+    fflush(stdin);
+    scanf("%c",&sON);
+    if (sON=='s') {
+        printf("Esta seguro? s/n");
+        scanf("%c",&sON2);
+        if (sON2=='s') {
+                aux.bajaCliente=1;
+                fseek(archi,-1 * sizeof(stCliente), SEEK_CUR);
+                fwrite(&aux, sizeof(stCliente),1, archi);
+                fclose(archi);
+
+            printf("la cuenta ha sido dada de baja");
+        }
+    }
+}
+void modificarPedido (stPedido pedido, stCliente cliente, char nombreArchivo[]) // La idea es que funcione tanto para cliente como para admin, podrian ser dos funciones diferentes pero similares si la implementacion resulta problematica
+{
+    FILE * archi=NULL;
+    archi = fopen(nombreArchivo,"r+b");
+    stPedido aux;
+    aux =pedido;
+    int menu;
+    char sON;
+
+    do {
+            if (cliente.admin==1) {
+        printf(" 1 - Dar pedido de baja \n 2 - Modificar precio pedido \n 0 Salir y guardar cambios \n");
+    } else {
+    printf("1 Dar pedido de baja \n 0 Salir y guardar cambios \n");
+    }
+    scanf("%d",&menu);
+    switch (menu) {
+    case 1:
+        printf("Desea dar de baja el pedido? s/n");
+        fflush(stdin);
+        scanf("%c",&sON);
+        if (sON=='s') {
+                aux.pedidoAnulado=1;
+            printf("el pedido ha sido anulado");
+        }
+        break;
+    case 2:
+        if (cliente.admin==1)
+        {
+            printf(" Costo actual del pedido: %f \n Ingrese nuevo costo: \n",aux.costoPedido);
+            scanf("%f",&aux.costoPedido);
+        }
+        break;
+    case 0:
+        break;
+    }
+    } while(menu!=0);
+    printf("los cambios han sido guardados");
+    fseek(archi,-1 * sizeof(stPedido), SEEK_CUR);
+ fwrite(&aux, sizeof(stPedido),1, archi);
+    fclose(archi);
+}
 
 
 

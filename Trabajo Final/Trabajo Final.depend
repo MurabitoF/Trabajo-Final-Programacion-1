@@ -27,3 +27,18 @@
 
 1591219472 c:\users\franco\documents\github\trabajo-final-programacion-1\trabajo final\gotoxy.h
 
+1591738930 source:c:\users\juan\documents\github\trabajo-final-programacion-1\trabajo final\gotoxy.c
+	<stdio.h>
+	<stdlib.h>
+	<windows.h>
+
+1592871823 source:c:\users\juan\documents\github\trabajo-final-programacion-1\trabajo final\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<conio.h>
+	<time.h>
+	"gotoxy.h"
+
+1591738930 c:\users\juan\documents\github\trabajo-final-programacion-1\trabajo final\gotoxy.h
+
