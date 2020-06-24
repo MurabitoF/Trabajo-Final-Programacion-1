@@ -116,11 +116,11 @@ void mostrarPedidos(char nombreArchivo[]);  //Muestra todos los pedidos en un ar
 void mostrarProductos(char nombreArchivo[]); //Muestra todos los productos en un archivo.
 
 ////////////////////////////Funciones de Modificacion////////////////////////// ¿Esta bien el apartado?
-void modificarPedido (stPedido pedido, stCliente cliente, char nombreArchivo[]); //Compila, no se si tira errores
+void modificarPedido (stPedido pedido, stCliente cliente, FILE * nombreArchivo); //Compila, no se si tira errores
 
 void modificarClienteV2(stCliente cliente, FILE * nombreArchivo); //Compila, no se si tira errores
 
-void bajaCliente (stCliente cliente, char nombreArchivo[]); //Compila, no se si tira errores
+void bajaCliente (stCliente cliente, FILE * nombreArchivo); //Compila, no se si tira errores
 
 const char aClientes[] = {"Datos\\clientes.dat"};
 const char aPedidos[] = {"Datos\\pedidos.dat"};
@@ -380,7 +380,11 @@ void menuOpciones(stCliente clientLoged)
             scanf("%c", &baja);
             if(baja == 's')
             {
-                //funcion dar de baja;
+
+    FILE * archi=NULL;
+    archi = fopen(nombreArchivo,"r+b");
+    bajaCliente(clientLoged, archi);
+    fclose(nombreArchivo);
             }
             break;
         }
@@ -848,7 +852,10 @@ void buscaPedidoIdCliente (int idCliente, char nombreArchivo[])
                 fflush(stdin);
                 control = getch();
                 if (control == 's')
-                {
+                {   FILE * archi=NULL;
+                    archi = fopen(nombreArchivo,"r+b");
+                    modificarPedido()
+                    fclose(nombreArchivo);
                     printf("Ingrese la id del pedido a modificar: ");
                     scanf("%d", &idP);
                     buscaIdPedido(idP, idC, archi);
@@ -1148,31 +1155,30 @@ void modificarClienteV2(stCliente cliente, FILE * nombreArchivo)
             switch (menu)
             {
             case 1:
-                printf("Ingrese nuevo nombre y apellido\n");
+                printf("Ingrese nuevo nombre y apellido: ");
                 fflush(stdin);
                 gets(aux.nombreApellido);
                 break;
             case 2:
-                printf("Ingrese nuevo Domicilio\n");
+                printf("Ingrese nuevo domicilio: ");
                 gets(aux.domicilio);
                 break;
             case 3:
-                printf("Ingrese nuevo telefono\n");
+                printf("Ingrese nuevo telefono: ");
                 gets(aux.telefono);
                 break;
             case 4:
-                printf("Ingrese nuevo mail\n");
+                printf("Ingrese nuevo email: ");
                 gets(aux.email);
                 break;
             case 0:
-                printf("\n");
                 break;
             }
         }
         while (menu!=0);
         printf("Sus nuevos datos son los siguientes: \n");
         mostrarCliente(aux);
-        printf("\n Desea guardar los cambios? s/n");
+        printf("\n Desea guardar los cambios? s/n \n");
         scanf("%c",&sON);
         if (sON=='s')
         {
@@ -1189,13 +1195,12 @@ void modificarClienteV2(stCliente cliente, FILE * nombreArchivo)
 }
 
 
-void bajaCliente (stCliente cliente, char nombreArchivo[])
+void bajaCliente (stCliente cliente, FILE * nombreArchivo)
 {
     stCliente aux;
     aux = cliente;
     char sON,sON2;
-    FILE * archi=NULL;
-    archi = fopen(nombreArchivo,"r+b");
+
     printf("Desea dar de baja la cuenta registrada a nombre de %c s/n ?",aux.nombreApellido);
     fflush(stdin);
     scanf("%c",&sON);
@@ -1206,19 +1211,17 @@ void bajaCliente (stCliente cliente, char nombreArchivo[])
         if (sON2=='s')
         {
             aux.bajaCliente=1;
-            fseek(archi,-1 * sizeof(stCliente), SEEK_CUR);
-            fwrite(&aux, sizeof(stCliente),1, archi);
-            fclose(archi);
+            fseek(nombreArchivo,-1 * sizeof(stCliente), SEEK_CUR);
+            fwrite(&aux, sizeof(stCliente),1, nombreArchivo);
+
 
             printf("la cuenta ha sido dada de baja");
         }
     }
 }
 
-void modificarPedido (stPedido pedido, stCliente cliente, char nombreArchivo[]) // La idea es que funcione tanto para cliente como para admin, podrian ser dos funciones diferentes pero similares si la implementacion resulta problematica
+void modificarPedido (stPedido pedido, stCliente cliente,FILE * nombreArchivo) // La idea es que funcione tanto para cliente como para admin, podrian ser dos funciones diferentes pero similares si la implementacion resulta problematica
 {
-    FILE * archi=NULL;
-    archi = fopen(nombreArchivo,"r+b");
     stPedido aux;
     aux =pedido;
     int menu;
