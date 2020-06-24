@@ -1092,6 +1092,9 @@ void mostrarProductos(char nombreArchivo[]) //Muestra todos los productos en un 
         fclose(arch);
     }
 }
+
+//////////////////////////////Modificar Pedidos//////////////////////////////////////
+
 void ModificarClienteV2(stCliente cliente, char nombreArchivo[])
 {
     char sON;
