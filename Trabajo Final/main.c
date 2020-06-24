@@ -79,9 +79,9 @@ int encuentraDomicilio(char nombreArchivo[], char dato[]); //Busca un cliente co
 
 int encuentraTelefono (char nombreArchivo[], char dato[]); //Busca un cliente con "x" telefono
 
-void buscaPedidoIdCliente (int idCliente, char nombreArchivo[]); //Busca los pedidos correspondientes a un cliente determinado
+void buscaPedidoIdCliente (stCliente clientLoged, int idCliente, char nombreArchivo[]); //Busca los pedidos correspondientes a un cliente determinado
 
-void buscaIdPedido (int idPedido, int idCliente, char nombreArchivo[]); // Busca un pedido según su id
+int buscaIdPedido (int idPedido, char nombreArchivo[]); // Busca un pedido según su id
 
 int encontroProducto(FILE * archivo, int idProd);  //Busca un producto en un archivo, si lo encuentra devuelve 1 en caso contrario 0.
 
@@ -307,7 +307,7 @@ void menuPrincipal(stCliente clientLoged)
             break;
         case 2:
             system("cls");
-            buscaPedidoIdCliente(clientLoged.idCliente, aPedidos);
+            buscaPedidoIdCliente(clientLoged, clientLoged.idCliente, aPedidos);
             break;
         case 3:
 
@@ -341,7 +341,7 @@ void menuPrincipal(stCliente clientLoged)
             logo();
             printf("Ingrese el id de un cliente");
             scanf("%d", &idClint);
-            buscaPedidoIdCliente(idClint, aPedidos);
+            buscaPedidoIdCliente(clientLoged, idClint, aPedidos);
         }
     }
     while(op != 0);
@@ -381,10 +381,10 @@ void menuOpciones(stCliente clientLoged)
             if(baja == 's')
             {
 
-    FILE * archi=NULL;
-    archi = fopen(nombreArchivo,"r+b");
-    bajaCliente(clientLoged, archi);
-    fclose(nombreArchivo);
+                FILE * archi = NULL;
+                archi = fopen(aClientes,"r+b");
+                bajaCliente(clientLoged, archi);
+                fclose(aClientes);
             }
             break;
         }
@@ -816,7 +816,7 @@ int encontroProducto(FILE * archivo, int idProd)  //Busca un producto en un arch
     return ctrl;
 }
 
-void buscaPedidoIdCliente (int idCliente, char nombreArchivo[])
+void buscaPedidoIdCliente (stCliente clientLoged, int idCliente, char nombreArchivo[])
 {
     FILE * archi = NULL;
     archi = fopen(nombreArchivo, "rb");
@@ -852,13 +852,11 @@ void buscaPedidoIdCliente (int idCliente, char nombreArchivo[])
                 fflush(stdin);
                 control = getch();
                 if (control == 's')
-                {   FILE * archi=NULL;
+                {
+                    FILE * archi=NULL;
                     archi = fopen(nombreArchivo,"r+b");
-                    modificarPedido()
-                    fclose(nombreArchivo);
-                    printf("Ingrese la id del pedido a modificar: ");
-                    scanf("%d", &idP);
-                    buscaIdPedido(idP, idC, archi);
+                    modificarPedido(pedido, clientLoged, archi);
+                    fclose(archi);
                     printf("Desea continuar? s/n");
                     fflush(stdin);
                     control = getch();
@@ -877,32 +875,26 @@ void buscaPedidoIdCliente (int idCliente, char nombreArchivo[])
     }
 }
 
-void buscaIdPedido (int idPedido, int idCliente, char nombreArchivo[])
+int buscaIdPedido (int idPedido, char nombreArchivo[])
 {
     int idP = idPedido;
     stPedido pedido;
     char opcion = 's';
+    int pos = 0;
 
     rewind(nombreArchivo);
     while (fread(&pedido, sizeof(stPedido), 1, nombreArchivo) > 0)
     {
-        if (pedido.idPedido == idP && pedido.idCliente == idCliente)
+        if (pedido.idPedido == idPedido)
         {
-            do
-            {
-                mostrarPedido(pedido);
-                printf("Queres modificar el pedido? s/n");
-                fflush(stdin);
-                opcion = getch();
-                printf("Placeholder\n");
-            }
-            while (opcion == 's');
+            pos = ftell(nombreArchivo)/sizeof(stPedido);
         }
         else
         {
             printf("No se pudo encontrar el pedido o no corresponde al cliente conectado");
         }
     }
+    return pos;
 }
 
 ///////////////////////////////Funciones de Operacion////////////////////////////////////
@@ -1206,7 +1198,7 @@ void bajaCliente (stCliente cliente, FILE * nombreArchivo)
     scanf("%c",&sON);
     if (sON=='s')
     {
-        printf("Esta seguro? s/n");
+        printf("Esta seguro? s/n\n");
         scanf("%c",&sON2);
         if (sON2=='s')
         {
@@ -1215,22 +1207,26 @@ void bajaCliente (stCliente cliente, FILE * nombreArchivo)
             fwrite(&aux, sizeof(stCliente),1, nombreArchivo);
 
 
-            printf("la cuenta ha sido dada de baja");
+            printf("La cuenta ha sido dada de baja");
         }
     }
 }
 
-void modificarPedido (stPedido pedido, stCliente cliente,FILE * nombreArchivo) // La idea es que funcione tanto para cliente como para admin, podrian ser dos funciones diferentes pero similares si la implementacion resulta problematica
+void modificarPedido (stPedido pedido, stCliente cliente, FILE * nombreArchivo) // La idea es que funcione tanto para cliente como para admin, podrian ser dos funciones diferentes pero similares si la implementacion resulta problematica
 {
     stPedido aux;
     aux =pedido;
     int menu;
     char sON;
-
+    int idP, pos;
     do
     {
+        printf("Ingresa el id del pedido que queres modificar: ");
+        scanf("%d", &idP);
+
         if (cliente.admin==1)
         {
+            pos = buscaIdPedido(idP, nombreArchivo);
             printf(" 1 - Dar pedido de baja \n 2 - Modificar precio pedido \n 0 Salir y guardar cambios \n");
         }
         else
@@ -1262,10 +1258,9 @@ void modificarPedido (stPedido pedido, stCliente cliente,FILE * nombreArchivo) /
         }
     }
     while(menu!=0);
-    printf("los cambios han sido guardados");
-    fseek(archi,-1 * sizeof(stPedido), SEEK_CUR);
-    fwrite(&aux, sizeof(stPedido),1, archi);
-    fclose(archi);
+    printf("Los cambios han sido guardados");
+    fseek(nombreArchivo, pos * sizeof(stPedido)-1, SEEK_CUR);
+    fwrite(&aux, sizeof(stPedido),1, nombreArchivo);
 }
 
 
