@@ -558,7 +558,7 @@ void busquedaCliente (stCliente cliente, char nombreArchivo[]) //Funcion princip
             system("cls");
             menuBuscaCliente();
             fflush(stdin);
-            opcion = getch();
+            scanf("%d", &opcion);
             switch (opcion)
             {
             //Busca nombre y apellido
@@ -849,7 +849,7 @@ void buscaPedidoIdCliente (stCliente clientLoged, char nombreArchivo[])
             {
                 printf("\nDesea modificar algun pedido? s/n ");
                 fflush(stdin);
-                control = getch();
+                scanf("%c", &control);
                 if (control == 's')
                 {
                     FILE * archi=NULL;
@@ -858,7 +858,7 @@ void buscaPedidoIdCliente (stCliente clientLoged, char nombreArchivo[])
                     fclose(archi);
                     printf("Desea continuar? s/n");
                     fflush(stdin);
-                    control = getch();
+                    scanf("%c", &control);
                 }
             }
             else
@@ -867,7 +867,7 @@ void buscaPedidoIdCliente (stCliente clientLoged, char nombreArchivo[])
                 printf("El cliente no tiene pedidos");
                 printf("Desea continuar? s/n");
                 fflush(stdin);
-                control = getch();
+                scanf("%c", &control);
             }
         }
         while (control == 's');
