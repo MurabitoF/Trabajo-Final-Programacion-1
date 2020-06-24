@@ -177,6 +177,7 @@ void logo()
     printf("\n\n");
     color(15);
 }
+
 void menu()
 {
 
@@ -249,25 +250,26 @@ void menuPrincipal(stCliente clientLoged)
 
     do
     {
-        system("cls");
-        logo();
-        printf("Bienvenido %s\n\n", clientLoged.nombreApellido);
-        printf("1. Hacer un pedido\n");
-        printf("2. Mis Pedidos\n");
-        printf("3. Cancelar Pedido\n");
-        printf("4. Opciones\n");
-        if(clientLoged.admin)
-        {
-            printf("5. Listado de Clientes\n");
-            printf("6. Buscar Cliente\n");
-            printf("7. Agregar Producto\n");
-            printf("8. Listado de Pedidos\n");
-            printf("9. Buscar Pedido por ID del cliente\n");
-        }
-        printf("0. Salir\n");
 
-        printf("Ingrese la opcion: ");
-        scanf("%d",&op);
+            system("cls");
+            logo();
+            printf("Bienvenido %s\n\n", clientLoged.nombreApellido);
+            printf("1. Hacer un pedido\n");
+            printf("2. Mis Pedidos\n");
+            printf("3. Cancelar Pedido\n");
+            printf("4. Opciones\n");
+            if(clientLoged.admin)
+            {
+                printf("5. Listado de Clientes\n");
+                printf("6. Buscar Cliente\n");
+                printf("7. Agregar Producto\n");
+                printf("8. Listado de Pedidos\n");
+                printf("9. Buscar Pedido por ID del cliente\n");
+            }
+            printf("0. Salir\n");
+
+            printf("Ingrese la opcion: ");
+            scanf("%d",&op);
 
         switch(op)
         {
