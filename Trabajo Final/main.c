@@ -47,7 +47,7 @@ int menuLogin (stCliente * clienteLog, char nombreArchivo[]);
 
 void menuPrincipal(stCliente clientLoged);
 
-void menuOpciones(stCliente clientLoged);
+void menuOpciones(stCliente clientLoged, char nombreArchivo[]);
 
 //////////////////////////////Funciones de Carga/////////////////////////////////////////////
 void crearCliente(char nombreArchivo[]);  //Ingresa los datos por teclado los datos para crear un cliente.
@@ -79,7 +79,7 @@ int encuentraDomicilio(char nombreArchivo[], char dato[]); //Busca un cliente co
 
 int encuentraTelefono (char nombreArchivo[], char dato[]); //Busca un cliente con "x" telefono
 
-void buscaPedidoIdCliente (stCliente clientLoged, char nombreArchivo[]); //Busca los pedidos correspondientes a un cliente determinado
+void buscaPedidoIdCliente (stCliente clientLoged, int idClient, char nombreArchivo[]); //Busca los pedidos correspondientes a un cliente determinado
 
 int buscaIdPedido (int idPedido, char nombreArchivo[]); // Busca un pedido según su id
 
@@ -111,14 +111,14 @@ void mostrarProducto(stProducto product); //Muestra un productos, con formato.
 
 void mostrarClientes(char nombreArchivo[]);  //Muestra todos los clientes en un archivo.
 
-void mostrarPedidos(char nombreArchivo[]);  //Muestra todos los pedidos en un archivo.
+void mostrarPedidos(char nombreArchivo[], int idClient);  //Muestra todos los pedidos en un archivo.
 
 void mostrarProductos(char nombreArchivo[]); //Muestra todos los productos en un archivo.
 
 ////////////////////////////Funciones de Modificacion////////////////////////// ¿Esta bien el apartado?
-void modificarPedido (stPedido pedido, stCliente cliente, FILE * nombreArchivo); //Compila, no se si tira errores
+void modificarPedido (stCliente cliente, char nombreArchivo[], int idPedido); //Compila, no se si tira errores
 
-void modificarClienteV2(stCliente cliente, FILE * nombreArchivo); //Compila, no se si tira errores
+void modificarCliente(stCliente cliente, FILE * nombreArchivo); //Compila, no se si tira errores
 
 void bajaCliente (stCliente cliente, FILE * nombreArchivo); //Compila, no se si tira errores
 
@@ -219,6 +219,8 @@ int menuLogin (stCliente * clienteLoged, char nombreArchivo[])
 
     if (arch != NULL)
     {
+        logo();
+        printf("\n\n");
         printf("Email: ");
         scanf("%s", &email);
         printf("Contrase%ca: ", 164);
@@ -256,15 +258,13 @@ void menuPrincipal(stCliente clientLoged)
         printf("Bienvenido %s\n\n", clientLoged.nombreApellido);
         printf("1. Hacer un pedido\n");
         printf("2. Mis Pedidos\n");
-        printf("3. Cancelar Pedido\n");
-        printf("4. Opciones\n");
+        printf("3. Opciones\n");
         if(clientLoged.admin)
         {
-            printf("5. Listado de Clientes\n");
-            printf("6. Buscar Cliente\n");
-            printf("7. Agregar Producto\n");
-            printf("8. Listado de Pedidos\n");
-            printf("9. Buscar Pedido por ID del cliente\n");
+            printf("4. Listado de Clientes\n");
+            printf("5. Buscar Cliente\n");
+            printf("6. Agregar Producto\n");
+            printf("7. Buscar Pedido por ID del cliente\n");
         }
         printf("0. Salir\n");
 
@@ -307,24 +307,24 @@ void menuPrincipal(stCliente clientLoged)
             break;
         case 2:
             system("cls");
-            buscaPedidoIdCliente(clientLoged, aPedidos);
+            buscaPedidoIdCliente(clientLoged, clientLoged.idCliente, aPedidos);
             break;
         case 3:
-
+            menuOpciones(clientLoged, aClientes);
             break;
         case 4:
-            menuOpciones(clientLoged);
-            break;
-        case 5:
+            system("cls");
             logo();
             mostrarClientes(aClientes);
             system("pause");
             break;
-        case 6:
+        case 5:
+            system("cls");
             logo();
             busquedaCliente(clientLoged, aClientes);
             break;
-        case 7:
+        case 6:
+            system("cls");
             logo();
             mostrarProductos(aProductos);
             printf("\nQuiere agregar un producto nuevo? s/n\n");
@@ -333,64 +333,69 @@ void menuPrincipal(stCliente clientLoged)
             if(menu == 's')
                 crearProducto(aProductos);
             break;
-        case 8:
-            logo();
-            mostrarPedidos(aPedidos);
-            break;
-        case 9:
+        case 7:
+            system("cls");
             logo();
             printf("Ingrese el id de un cliente");
             scanf("%d", &idClint);
-            buscaPedidoIdCliente(clientLoged, aPedidos);
+            buscaPedidoIdCliente(clientLoged, idClint, aPedidos);
         }
     }
     while(op != 0);
 }
 
-void menuOpciones(stCliente clientLoged)
+void menuOpciones(stCliente clientLoged, char nombreArchivo[])
 {
     int op = 0;
     char baja = 0;
 
-    do
+    FILE * archivo = NULL;
+    archivo = fopen(nombreArchivo,"r+b");
+
+    if(archivo != NULL)
     {
-        system("cls");
-        logo();
-        printf("\n1. Mis Datos\n");
-        printf("2. Dar de baja\n");
-        printf("0. Salir\n");
-        printf("Ingrese su opcion: ");
-        scanf("%d",&op);
-
-        switch(op)
+        do
         {
-        case 1:
             system("cls");
             logo();
-            printf("\nSus datos son los siguientes: \n");
-            mostrarCliente(clientLoged);
-            system("pause");
-            //funcion de modificar
-            break;
-        case 2:
-            system("cls");
-            logo();
-            printf("\nEsta seguro de dar de baja? s/n");
-            fflush(stdin);
-            scanf("%c", &baja);
-            if(baja == 's')
+            printf("\n1. Mis Datos\n");
+            printf("2. Dar de baja\n");
+            printf("0. Salir\n");
+            printf("Ingrese su opcion: ");
+            scanf("%d",&op);
+
+            switch(op)
             {
+            case 1:
 
-                FILE * archi = NULL;
-                archi = fopen(aClientes,"r+b");
-                bajaCliente(clientLoged, archi);
-                fclose(aClientes);
+                system("cls");
+                logo();
+                printf("\nSus datos son los siguientes: \n");
+                mostrarCliente(clientLoged);
+                system("pause");
+                modificarCliente(clientLoged, archivo);
+                break;
+            case 2:
+                system("cls");
+                logo();
+                printf("\nEsta seguro de dar de baja? s/n");
+                fflush(stdin);
+                scanf("%c", &baja);
+                if(baja == 's')
+                {
+
+                    FILE * archi = NULL;
+                    archi = fopen(aClientes,"r+b");
+                    bajaCliente(clientLoged, archi);
+                    fclose(aClientes);
+                }
+                break;
             }
-            break;
-        }
 
+        }while(op != 0);
     }
-    while(op != 0);
+
+    fclose(archivo);
 }
 
 //////////////////////////////Funciones de Carga/////////////////////////////////////////////
@@ -489,7 +494,7 @@ void crearPedido(char nombreArchivo[], stProducto carro[], int cantProd, int idC
     }
     pedido.costoPedido = totalCarrito(carro, cantProd);
     pedido.idCliente = idCliente;
-    pedido.pedidoAnulado = 0;
+    pedido.pedidoAnulado = 1;
     fechaHora(&pedido.fechaPedido);
     pedido.productos = cantProd;
 
@@ -580,7 +585,7 @@ void busquedaCliente (stCliente cliente, char nombreArchivo[]) //Funcion princip
                     if (ctrlM =='s')
                     {
                         bufferArch = fopen(nombreArchivo, "r+b");
-                        modificarClienteV2(cliente, bufferArch);
+                        modificarCliente(cliente, bufferArch);
                     }
                 }
                 else
@@ -609,7 +614,7 @@ void busquedaCliente (stCliente cliente, char nombreArchivo[]) //Funcion princip
                     if (ctrlM =='s')
                     {
                         bufferArch = fopen(nombreArchivo, "r+b");
-                        modificarClienteV2(cliente, bufferArch);
+                        modificarCliente(cliente, bufferArch);
                     }
                 }
                 else
@@ -638,7 +643,7 @@ void busquedaCliente (stCliente cliente, char nombreArchivo[]) //Funcion princip
                     if (ctrlM =='s')
                     {
                         bufferArch = fopen(nombreArchivo, "r+b");
-                        modificarClienteV2(cliente, bufferArch);
+                        modificarCliente(cliente, bufferArch);
                     }
                 }
                 else
@@ -667,7 +672,7 @@ void busquedaCliente (stCliente cliente, char nombreArchivo[]) //Funcion princip
                     if (ctrlM =='s')
                     {
                         bufferArch = fopen(nombreArchivo, "r+b");
-                        modificarClienteV2(cliente, bufferArch);
+                        modificarCliente(cliente, bufferArch);
                     }
                 }
                 else
@@ -816,34 +821,26 @@ int encontroProducto(FILE * archivo, int idProd)  //Busca un producto en un arch
     return ctrl;
 }
 
-void buscaPedidoIdCliente (stCliente clientLoged, char nombreArchivo[])
+void buscaPedidoIdCliente (stCliente clientLoged, int idClient, char nombreArchivo[])
 {
-    FILE * archi = NULL;
-    archi = fopen(nombreArchivo, "rb");
 
-    stPedido pedido;
     int idP;
     int flag = 0;
 
     char control = 's';
 
-    if (archi!=NULL)
-    {
-        do
-        {
-            system("cls");
-            rewind(archi);
-            while (!feof(archi))
-            {
-                if (fread(&pedido, sizeof(stPedido), 1, archi) > 0)
-                {
-                    if (pedido.idCliente == clientLoged.idCliente)
-                    {
-                        mostrarPedido(pedido);
-                        flag = 1;
-                    }
-                }
+    mostrarPedidos(nombreArchivo, idClient);
 
+<<<<<<< HEAD
+    printf("\nDesea modificar algun pedido? s/n ");
+    fflush(stdin);
+    scanf("%c",&control);
+    if (control == 's')
+    {
+        printf("Ingresa el id del pedido que queres modificar: ");
+        scanf("%d", &idP);
+        modificarPedido(clientLoged, nombreArchivo, idP);
+=======
             }
             if (flag == 1)
             {
@@ -871,6 +868,7 @@ void buscaPedidoIdCliente (stCliente clientLoged, char nombreArchivo[])
             }
         }
         while (control == 's');
+>>>>>>> 892decc52588063af631d5f92ec29cbf8a08a179
     }
 }
 
@@ -878,20 +876,21 @@ int buscaIdPedido (int idPedido, char nombreArchivo[])
 {
     int idP = idPedido;
     stPedido pedido;
-    char opcion = 's';
     int pos = 0;
 
-    FILE * archi = fopen(nombreArchivo, "rb");
-    rewind(archi);
+    FILE * archivo = NULL;
+    archivo = fopen(nombreArchivo,"rb");
 
-    while (fread(&pedido, sizeof(stPedido), 1, archi) > 0)
+    rewind(archivo);
+
+    while (fread(&pedido, sizeof(stPedido), 1, archivo) > 0 && pos == 0)
     {
         if (pedido.idPedido == idP)
         {
-            pos = ftell(archi)/sizeof(stPedido);
+            pos = ftell(archivo)/sizeof(stPedido);
         }
     }
-    fclose(archi);
+    fclose(archivo);
     return pos;
 }
 
@@ -1064,7 +1063,7 @@ void mostrarPedido(stPedido pedido) //Muestra un pedido, con formato.
 
 void mostrarProducto(stProducto product) //Muestra un productos, con formato.
 {
-    printf("Menu: %d\t", product.idProducto);
+    printf("Menu: %d ", product.idProducto);
     printf("%s\n", product.descProd);
     printf("Precio: $%.2f\n", product.precioProd);
     printf("\n");
@@ -1090,7 +1089,7 @@ void mostrarClientes(char nombreArchivo[])  //Muestra todos los clientes en un a
     }
 }
 
-void mostrarPedidos(char nombreArchivo[])  //Muestra todos los pedidos en un archivo.
+void mostrarPedidos(char nombreArchivo[],int idClient)  //Muestra todos los pedidos en un archivo.
 {
     FILE * arch;
     stPedido aux;
@@ -1101,7 +1100,7 @@ void mostrarPedidos(char nombreArchivo[])  //Muestra todos los pedidos en un arc
     {
         while(fread(&aux,sizeof(stPedido),1,arch)>0)
         {
-            if(aux.pedidoAnulado == 1)
+            if(aux.pedidoAnulado == 1 && idClient == aux.idCliente)
             {
                 mostrarPedido(aux);
             }
@@ -1129,7 +1128,7 @@ void mostrarProductos(char nombreArchivo[]) //Muestra todos los productos en un 
 
 //////////////////////////////Modificar Pedidos//////////////////////////////////////
 
-void modificarClienteV2(stCliente cliente, FILE * nombreArchivo)
+void modificarCliente(stCliente cliente, FILE * nombreArchivo)
 {
     char sON = 's';
     int menu;
@@ -1210,66 +1209,72 @@ void bajaCliente (stCliente cliente, FILE * nombreArchivo)
     }
 }
 
-void modificarPedido (stPedido pedido, stCliente cliente, FILE * nombreArchivo) // La idea es que funcione tanto para cliente como para admin, podrian ser dos funciones diferentes pero similares si la implementacion resulta problematica
+void modificarPedido (stCliente cliente, char nombreArchivo[], int idPedido) // La idea es que funcione tanto para cliente como para admin, podrian ser dos funciones diferentes pero similares si la implementacion resulta problematica
 {
     stPedido aux;
-    aux = pedido;
     int menu;
     char sON;
-    int idP, pos;
-    do
+    int pos = 0;
+
+    FILE * archivo = NULL;
+    archivo = fopen(nombreArchivo,"r+b");
+
+    if(archivo != NULL)
     {
-        rewind(nombreArchivo);
-        printf("Ingresa el id del pedido que queres modificar: ");
-        scanf("%d", &idP);
-        pos = buscaIdPedido(idP, nombreArchivo);
+        pos = buscaIdPedido(idPedido, nombreArchivo);
         if (pos!=0)
         {
-            if (cliente.admin==1)
-
+            fseek(archivo, (pos-1) * sizeof(stPedido),SEEK_SET);
+            fread(&aux,sizeof(stPedido),1,archivo);
+            if (cliente.admin)
             {
-                printf(" 1 - Dar pedido de baja \n 2 - Modificar precio pedido \n 0 Salir y guardar cambios \n");
+                printf("1 - Dar pedido de baja \n");
+                printf("2 - Modificar precio pedido\n");
+                printf("0 - Salir y guardar cambios \n");
             }
             else
             {
-                printf("1 Dar pedido de baja \n 0 Salir y guardar cambios \n");
+                printf("1 Dar pedido de baja\n");
+                printf("0 Salir y guardar cambios \n");
             }
             scanf("%d",&menu);
             switch (menu)
             {
             case 1:
-                printf("Desea dar de baja el pedido? s/n");
+                printf("Desea dar de baja el pedido? s/n\n");
                 fflush(stdin);
                 scanf("%c",&sON);
                 if (sON=='s')
                 {
-                    aux.pedidoAnulado=1;
-                    printf("el pedido ha sido anulado");
+                    aux.pedidoAnulado = 0;
                 }
                 break;
             case 2:
-                if (cliente.admin==1)
+                if (cliente.admin)
                 {
-                    printf(" Costo actual del pedido: %f \n Ingrese nuevo costo: \n",aux.costoPedido);
+                    printf(" Costo actual del pedido: %f \nIngrese nuevo costo: \n",aux.costoPedido);
                     scanf("%f",&aux.costoPedido);
                 }
                 break;
             case 0:
                 break;
             }
-            printf("Los cambios han sido guardados");
-            fseek(nombreArchivo, pos-1 * sizeof(stPedido), SEEK_CUR);
-            fwrite(&aux, sizeof(stPedido),1, nombreArchivo);
+
+            fseek(archivo, -1 * sizeof(stPedido), SEEK_CUR);
+            fwrite(&aux, sizeof(stPedido),1, archivo);
+
+            printf("Los cambios han sido guardados.\n");
+            system("pause");
         }
         else
         {
-            printf("No se encontro un pedido con ese id");
+            printf("No se encontro un pedido con ese id\n");
             system("pause");
-            system("cls");
         }
+        fclose(archivo);
     }
-    while(menu!=0);
 }
+
 
 
 
