@@ -79,7 +79,7 @@ int encuentraDomicilio(char nombreArchivo[], char dato[]); //Busca un cliente co
 
 int encuentraTelefono (char nombreArchivo[], char dato[]); //Busca un cliente con "x" telefono
 
-void buscaPedidoIdCliente (stCliente clientLoged, int idCliente, char nombreArchivo[]); //Busca los pedidos correspondientes a un cliente determinado
+void buscaPedidoIdCliente (stCliente clientLoged, char nombreArchivo[]); //Busca los pedidos correspondientes a un cliente determinado
 
 int buscaIdPedido (int idPedido, char nombreArchivo[]); // Busca un pedido según su id
 
@@ -307,7 +307,7 @@ void menuPrincipal(stCliente clientLoged)
             break;
         case 2:
             system("cls");
-            buscaPedidoIdCliente(clientLoged, clientLoged.idCliente, aPedidos);
+            buscaPedidoIdCliente(clientLoged, aPedidos);
             break;
         case 3:
 
@@ -341,7 +341,7 @@ void menuPrincipal(stCliente clientLoged)
             logo();
             printf("Ingrese el id de un cliente");
             scanf("%d", &idClint);
-            buscaPedidoIdCliente(clientLoged, idClint, aPedidos);
+            buscaPedidoIdCliente(clientLoged, aPedidos);
         }
     }
     while(op != 0);
@@ -816,13 +816,12 @@ int encontroProducto(FILE * archivo, int idProd)  //Busca un producto en un arch
     return ctrl;
 }
 
-void buscaPedidoIdCliente (stCliente clientLoged, int idCliente, char nombreArchivo[])
+void buscaPedidoIdCliente (stCliente clientLoged, char nombreArchivo[])
 {
     FILE * archi = NULL;
     archi = fopen(nombreArchivo, "rb");
 
     stPedido pedido;
-    int idC = idCliente;
     int idP;
     int flag = 0;
 
@@ -838,7 +837,7 @@ void buscaPedidoIdCliente (stCliente clientLoged, int idCliente, char nombreArch
             {
                 if (fread(&pedido, sizeof(stPedido), 1, archi) > 0)
                 {
-                    if (pedido.idCliente == idC)
+                    if (pedido.idCliente == clientLoged.idCliente)
                     {
                         mostrarPedido(pedido);
                         flag = 1;
@@ -1221,12 +1220,14 @@ void modificarPedido (stPedido pedido, stCliente cliente, FILE * nombreArchivo) 
     int idP, pos;
     do
     {
+        rewind(nombreArchivo);
         printf("Ingresa el id del pedido que queres modificar: ");
         scanf("%d", &idP);
-
+        pos = buscaIdPedido(idP, nombreArchivo);
+        if (pos!=0) {
         if (cliente.admin==1)
-        {
-            pos = buscaIdPedido(idP, nombreArchivo);
+
+            {
             printf(" 1 - Dar pedido de baja \n 2 - Modificar precio pedido \n 0 Salir y guardar cambios \n");
         }
         else
@@ -1256,11 +1257,18 @@ void modificarPedido (stPedido pedido, stCliente cliente, FILE * nombreArchivo) 
         case 0:
             break;
         }
+
+    printf("Los cambios han sido guardados");
+    fseek(nombreArchivo, pos-1 * sizeof(stPedido), SEEK_CUR);
+    fwrite(&aux, sizeof(stPedido),1, nombreArchivo);
+    } else {
+    printf("No se encontro un pedido con ese id");
+    system("pause");
+    system("cls");
+    }
     }
     while(menu!=0);
-    printf("Los cambios han sido guardados");
-    fseek(nombreArchivo, pos * sizeof(stPedido)-1, SEEK_CUR);
-    fwrite(&aux, sizeof(stPedido),1, nombreArchivo);
+
 }
 
 
