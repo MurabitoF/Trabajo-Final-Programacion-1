@@ -392,7 +392,8 @@ void menuOpciones(stCliente clientLoged, char nombreArchivo[])
                 break;
             }
 
-        }while(op != 0);
+        }
+        while(op != 0);
     }
 
     fclose(archivo);
@@ -831,7 +832,6 @@ void buscaPedidoIdCliente (stCliente clientLoged, int idClient, char nombreArchi
 
     mostrarPedidos(nombreArchivo, idClient);
 
-<<<<<<< HEAD
     printf("\nDesea modificar algun pedido? s/n ");
     fflush(stdin);
     scanf("%c",&control);
@@ -840,35 +840,6 @@ void buscaPedidoIdCliente (stCliente clientLoged, int idClient, char nombreArchi
         printf("Ingresa el id del pedido que queres modificar: ");
         scanf("%d", &idP);
         modificarPedido(clientLoged, nombreArchivo, idP);
-=======
-            }
-            if (flag == 1)
-            {
-                printf("\nDesea modificar algun pedido? s/n ");
-                fflush(stdin);
-                scanf("%c", &control);
-                if (control == 's')
-                {
-                    FILE * archi=NULL;
-                    archi = fopen(nombreArchivo,"r+b");
-                    modificarPedido(pedido, clientLoged, archi);
-                    fclose(archi);
-                    printf("Desea continuar? s/n");
-                    fflush(stdin);
-                    scanf("%c", &control);
-                }
-            }
-            else
-            {
-                system("cls");
-                printf("El cliente no tiene pedidos");
-                printf("Desea continuar? s/n");
-                fflush(stdin);
-                scanf("%c", &control);
-            }
-        }
-        while (control == 's');
->>>>>>> 892decc52588063af631d5f92ec29cbf8a08a179
     }
 }
 
