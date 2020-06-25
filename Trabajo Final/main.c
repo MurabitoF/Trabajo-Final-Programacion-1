@@ -153,7 +153,7 @@ int main()
             break;
         case '2':
             system("cls");
-            printf("Placeholder");
+            crearCliente(aClientes);
             system("pause");
             break;
         }
@@ -211,6 +211,7 @@ int menuLogin (stCliente * clienteLoged, char nombreArchivo[])
 
     char email[40];
     char password[30] = {0};
+    stCliente aux;
 
     int cant = 0;
     int control = 0;
@@ -234,9 +235,20 @@ int menuLogin (stCliente * clienteLoged, char nombreArchivo[])
 
         if (fEmail != 0 && fPass != 0)
         {
-            control = 1;
-            fseek(arch, -2*sizeof(stCliente), SEEK_CUR);
-            fread(clienteLoged, sizeof(stCliente), 1, arch);
+            if(!feof(arch))
+            {
+                fseek(arch, -2*sizeof(stCliente), SEEK_CUR);
+            }
+            else
+            {
+                fseek(arch, -1*sizeof(stCliente),SEEK_CUR);
+            }
+            fread(&aux, sizeof(stCliente), 1, arch);
+            if(aux.bajaCliente == 1)
+            {
+                control = 1;
+                *clienteLoged = aux;
+            }
         }
     }
     fclose(arch);
@@ -297,6 +309,7 @@ void menuPrincipal(stCliente clientLoged)
             {
                 mostrarProducto(carrito[i]);
             }
+            printf("El total es: %.2f\n",totalCarrito(carrito, cant-1));
             printf("Su pedido es correcto? s/n\n");
             fflush(stdin);
             scanf("%c",&menu);
@@ -336,8 +349,9 @@ void menuPrincipal(stCliente clientLoged)
         case 7:
             system("cls");
             logo();
-            printf("Ingrese el id de un cliente");
+            printf("Ingrese el id de un cliente: ");
             scanf("%d", &idClint);
+            system("cls");
             buscaPedidoIdCliente(clientLoged, idClint, aPedidos);
         }
     }
@@ -377,18 +391,7 @@ void menuOpciones(stCliente clientLoged, char nombreArchivo[])
                 break;
             case 2:
                 system("cls");
-                logo();
-                printf("\nEsta seguro de dar de baja? s/n");
-                fflush(stdin);
-                scanf("%c", &baja);
-                if(baja == 's')
-                {
-
-                    FILE * archi = NULL;
-                    archi = fopen(aClientes,"r+b");
-                    bajaCliente(clientLoged, archi);
-                    fclose(aClientes);
-                }
+                bajaCliente(clientLoged, archivo);
                 break;
             }
 
@@ -455,8 +458,7 @@ void crearCliente(char nombreArchivo[])  //Ingresa los datos por teclado los dat
     encriptarPass(pass, client.password);
 
     client.idCliente = contadorDatos(nombreArchivo, sizeof(stCliente)) + 1;
-    printf("%d \n", client.idCliente);
-    client.bajaCliente = 0;
+    client.bajaCliente = 1;
     client.admin = 0;
 
     if(!encuentraCliente(nombreArchivo, client.email))
@@ -466,7 +468,6 @@ void crearCliente(char nombreArchivo[])  //Ingresa los datos por teclado los dat
     else
     {
         printf("El usuario ya esta registrado.\n");
-        system("pause");
     }
 }
 
@@ -548,7 +549,7 @@ void registrarProducto(char nombreArchivo[], stProducto prod)  //Registra un pro
 void busquedaCliente (stCliente cliente, char nombreArchivo[]) //Funcion principal de busqueda de clientes
 {
     char dato[60];
-    char opcion;
+    int opcion;
     int pos = 0;
     char modific;
     char ctrlM = 's';
@@ -562,13 +563,14 @@ void busquedaCliente (stCliente cliente, char nombreArchivo[]) //Funcion princip
             pos = 0;
             rewind(bufferArch);
             system("cls");
+            logo();
+            printf("\n\n");
             menuBuscaCliente();
-            fflush(stdin);
             scanf("%d", &opcion);
             switch (opcion)
             {
             //Busca nombre y apellido
-            case '1':
+            case 1:
                 system("cls");
                 printf("Buscar: ");
                 fflush(stdin);
@@ -597,7 +599,7 @@ void busquedaCliente (stCliente cliente, char nombreArchivo[]) //Funcion princip
                 break;
 
             //Busca domicilio
-            case '2':
+            case 2:
                 system("cls");
                 printf("Buscar: ");
                 fflush(stdin);
@@ -626,7 +628,7 @@ void busquedaCliente (stCliente cliente, char nombreArchivo[]) //Funcion princip
                 break;
 
             //Busca telefono
-            case '3':
+            case 3:
                 system("cls");
                 printf("Buscar: ");
                 fflush(stdin);
@@ -655,7 +657,7 @@ void busquedaCliente (stCliente cliente, char nombreArchivo[]) //Funcion princip
                 break;
 
             //Busca email
-            case '4':
+            case 4:
                 system("cls");
                 printf("Buscar: ");
                 fflush(stdin);
@@ -684,7 +686,7 @@ void busquedaCliente (stCliente cliente, char nombreArchivo[]) //Funcion princip
                 break;
             }
         }
-        while (opcion != '0');
+        while (opcion != 0);
     }
     else
     {
@@ -829,7 +831,8 @@ void buscaPedidoIdCliente (stCliente clientLoged, int idClient, char nombreArchi
     int flag = 0;
 
     char control = 's';
-
+    logo();
+    printf("\n\n");
     mostrarPedidos(nombreArchivo, idClient);
 
     printf("\nDesea modificar algun pedido? s/n ");
@@ -1155,27 +1158,29 @@ void modificarCliente(stCliente cliente, FILE * nombreArchivo)
 }
 
 
-void bajaCliente (stCliente cliente, FILE * nombreArchivo)
+void bajaCliente (stCliente cliente, FILE * archivo)
 {
     stCliente aux;
     aux = cliente;
     char sON,sON2;
+    int pos = 0;
 
-    printf("Desea dar de baja la cuenta registrada a nombre de %c s/n ?",aux.nombreApellido);
+    printf("Desea dar de baja la cuenta registrada a nombre de %s s/n?\n",aux.nombreApellido);
     fflush(stdin);
     scanf("%c",&sON);
     if (sON=='s')
     {
         printf("Esta seguro? s/n\n");
+        fflush(stdin);
         scanf("%c",&sON2);
         if (sON2=='s')
         {
-            aux.bajaCliente=1;
-            fseek(nombreArchivo,-1 * sizeof(stCliente), SEEK_CUR);
-            fwrite(&aux, sizeof(stCliente),1, nombreArchivo);
-
-
+            aux.bajaCliente=0;
+            pos = encuentraEmail(archivo,aux.email);
+            fseek(archivo,(pos-1) * sizeof(stCliente), SEEK_SET);
+            fwrite(&aux, sizeof(stCliente),1, archivo);
             printf("La cuenta ha sido dada de baja");
+            system("pause");
         }
     }
 }
