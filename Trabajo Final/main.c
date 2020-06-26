@@ -334,6 +334,7 @@ void menuPrincipal(stCliente clientLoged)
             {
                 system("cls");
                 logo();
+                printf("===============================================\n");
                 mostrarClientes(aClientes);
                 system("pause");
             }else
@@ -1100,6 +1101,7 @@ void mostrarClientes(char nombreArchivo[])  //Muestra todos los clientes en un a
             if(aux.bajaCliente == 1)
             {
                 mostrarCliente(aux);
+                printf("===============================================\n");
             }
         }
         fclose(arch);
@@ -1115,11 +1117,13 @@ void mostrarPedidos(char nombreArchivo[],int idClient)  //Muestra todos los pedi
 
     if(arch != NULL)
     {
+        printf("===============================================\n");
         while(fread(&aux,sizeof(stPedido),1,arch)>0)
         {
             if(aux.pedidoAnulado == 1 && idClient == aux.idCliente)
             {
                 mostrarPedido(aux);
+                printf("===============================================\n");
             }
         }
         fclose(arch);
@@ -1135,9 +1139,11 @@ void mostrarProductos(char nombreArchivo[]) //Muestra todos los productos en un 
 
     if(arch != NULL)
     {
+        printf("===============================================\n");
         while(fread(&aux,sizeof(stProducto),1,arch)>0)
         {
             mostrarProducto(aux);
+            printf("===============================================\n");
         }
         fclose(arch);
     }
