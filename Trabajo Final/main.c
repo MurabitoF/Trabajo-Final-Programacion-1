@@ -149,7 +149,6 @@ int main()
             {
                 printf("El email o la contrase%ca no corresponden a un usario\n", 164);
             }
-            system("pause");
             break;
         case '2':
             system("cls");
@@ -183,24 +182,26 @@ void menu()
 
     system("cls");
     logo();
-    printf("============|-----Menu Principal-----|===========\n");
-    printf("=\t\t\t\t\t\t=\n");
-    printf("=   [ 1 ] Ingresar\t\t\t\t=\n");
-    printf("=   [ 2 ] Crear Cuenta\t\t\t\t=\n");
-    printf("=   [ 0 ] Salir\t\t\t\t\t=\n");
-    printf("=\t\t\t\t\t\t=\n");
-    printf("=================================================\n");
+    printf("============|-----Menu de Ingreso-----|===========\n");
+    printf("=\t\t\t\t\t\t =\n");
+    printf("=   [ 1 ] Ingresar\t\t\t\t =\n");
+    printf("=   [ 2 ] Crear Cuenta\t\t\t\t =\n");
+    printf("=   [ 0 ] Salir\t\t\t\t\t =\n");
+    printf("=\t\t\t\t\t\t =\n");
+    printf("==================================================\n");
 }
 
 void menuBuscaCliente()
 {
-    printf("============|-----Busqueda de Clientes-----|===========\n");
-    printf("[ 1 ] Nombre y apellido\n");
-    printf("[ 2 ] Domicilio\n");
-    printf("[ 3 ] Numero de telefono\n");
-    printf("[ 4 ] Direccion de email\n");
-    printf("[ 0 ] Volver\n");
-    printf("=======================================================\n");
+    printf("============|-----Datos del Clientes-----|===========\n");
+    printf("=\t\t\t\t\t\t    =\n");
+    printf("=   [ 1 ] Nombre y apellido\t\t\t    =\n");
+    printf("=   [ 2 ] Domicilio\t\t\t\t    =\n");
+    printf("=   [ 3 ] Numero de telefono\t\t\t    =\n");
+    printf("=   [ 4 ] Direccion de email\t\t\t    =\n");
+    printf("=   [ 0 ] Volver\t\t\t\t    =\n");
+    printf("=\t\t\t\t\t\t    =\n");
+    printf("=====================================================\n\n");
 }
 
 int menuLogin (stCliente * clienteLoged, char nombreArchivo[])
@@ -267,19 +268,22 @@ void menuPrincipal(stCliente clientLoged)
 
         system("cls");
         logo();
-        printf("Bienvenido %s\n\n", clientLoged.nombreApellido);
-        printf("1. Hacer un pedido\n");
-        printf("2. Mis Pedidos\n");
-        printf("3. Opciones\n");
+        printf("%8c|-----Bienvenido %s-----|\n\n", ' ', clientLoged.nombreApellido);
+        printf("=====================================================\n");
+        printf("=\t\t\t\t\t\t    =\n");
+        printf("=   [ 1 ] Hacer un pedido\t\t\t    =\n");
+        printf("=   [ 2 ] Mis Pedidos\t\t\t\t    =\n");
+        printf("=   [ 3 ] Opciones\t\t\t\t    =\n");
         if(clientLoged.admin)
         {
-            printf("4. Listado de Clientes\n");
-            printf("5. Buscar Cliente\n");
-            printf("6. Agregar Producto\n");
-            printf("7. Buscar Pedido por ID del cliente\n");
+            printf("=   [ 4 ] Listado de Clientes\t\t\t    =\n");
+            printf("=   [ 5 ] Buscar Cliente\t\t\t    =\n");
+            printf("=   [ 6 ] Agregar Producto\t\t\t    =\n");
+            printf("=   [ 7 ] Buscar Pedido por ID del cliente\t    =\n");
         }
-        printf("0. Salir\n");
-
+        printf("=   [ 0 ] Salir\t\t\t\t\t    =\n");
+        printf("=\t\t\t\t\t\t    =\n");
+        printf("=====================================================\n\n");
         printf("Ingrese la opcion: ");
         scanf("%d",&op);
 
@@ -362,6 +366,7 @@ void menuOpciones(stCliente clientLoged, char nombreArchivo[])
 {
     int op = 0;
     char baja = 0;
+    char control = 's';
 
     FILE * archivo = NULL;
     archivo = fopen(nombreArchivo,"r+b");
@@ -372,9 +377,13 @@ void menuOpciones(stCliente clientLoged, char nombreArchivo[])
         {
             system("cls");
             logo();
-            printf("\n1. Mis Datos\n");
-            printf("2. Dar de baja\n");
-            printf("0. Salir\n");
+            printf("==================|-----Opciones-----|=================\n");
+            printf("=\t\t\t\t\t\t      =\n");
+            printf("=   [ 1 ] Mis Datos\t\t\t\t      =\n");
+            printf("=   [ 2 ] Dar de baja\t\t\t\t      =\n");
+            printf("=   [ 0 ] Salir\t\t\t\t\t      =\n");
+            printf("=\t\t\t\t\t\t      =\n");
+            printf ("=======================================================\n\n");
             printf("Ingrese su opcion: ");
             scanf("%d",&op);
 
@@ -386,8 +395,13 @@ void menuOpciones(stCliente clientLoged, char nombreArchivo[])
                 logo();
                 printf("\nSus datos son los siguientes: \n");
                 mostrarCliente(clientLoged);
-                system("pause");
-                modificarCliente(clientLoged, archivo);
+                printf ("\nDesea modificar alguno de sus datos? s/n\n");
+                fflush (stdin);
+                scanf("%c", &control);
+                if (control == 's')
+                {
+                    modificarCliente(clientLoged, archivo);
+                }
                 break;
             case 2:
                 system("cls");
@@ -1112,6 +1126,7 @@ void modificarCliente(stCliente cliente, FILE * nombreArchivo)
     {
 
         menuBuscaCliente();
+        printf("Elija una opcion: ");
         scanf("%d",&menu);
         fflush(stdin);
 
@@ -1139,9 +1154,9 @@ void modificarCliente(stCliente cliente, FILE * nombreArchivo)
         }
     }
     while (menu!=0);
-    printf("Sus nuevos datos son los siguientes: \n");
+    printf("Sus nuevos datos son los siguientes: \n\n");
     mostrarCliente(aux);
-    printf("\n Desea guardar los cambios? s/n \n");
+    printf("\n\n Desea guardar los cambios? s/n \n");
     scanf("%c",&sON);
     if (sON=='s')
     {
@@ -1204,14 +1219,14 @@ void modificarPedido (stCliente cliente, char nombreArchivo[], int idPedido) // 
             fread(&aux,sizeof(stPedido),1,archivo);
             if (cliente.admin)
             {
-                printf("1 - Dar pedido de baja \n");
-                printf("2 - Modificar precio pedido\n");
-                printf("0 - Salir y guardar cambios \n");
+                printf("[ 1 ] Dar pedido de baja \n");
+                printf("[ 2 ] Modificar precio pedido\n");
+                printf("[ 0 ] Salir y guardar cambios \n");
             }
             else
             {
-                printf("1 Dar pedido de baja\n");
-                printf("0 Salir y guardar cambios \n");
+                printf("[ 1 ] Dar pedido de baja\n");
+                printf("[ 0 ] Salir y guardar cambios \n");
             }
             scanf("%d",&menu);
             switch (menu)
