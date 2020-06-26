@@ -67,3 +67,10 @@ Domicilio:         Calle 4234
 Telefono:          654654
 Email:             batman@gmail.com
 Pass: Murcielago
+
+ID:                11
+Nombre y Apellido: Diana Prince
+Domicilio:         Calle 1234
+Telefono:          234324
+Email:             notwonderwoman@gmail.com
+Pass: Lazito
