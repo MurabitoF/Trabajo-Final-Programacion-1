@@ -330,33 +330,62 @@ void menuPrincipal(stCliente clientLoged)
             menuOpciones(clientLoged, aClientes);
             break;
         case 4:
-            system("cls");
-            logo();
-            mostrarClientes(aClientes);
-            system("pause");
+            if (clientLoged.admin)
+            {
+                system("cls");
+                logo();
+                mostrarClientes(aClientes);
+                system("pause");
+            }else
+            {
+                printf("Esta opcion no es valida\n");
+                system("pause");
+            }
             break;
         case 5:
-            system("cls");
-            logo();
-            busquedaCliente(clientLoged, aClientes);
+            if (clientLoged.admin)
+            {
+                system("cls");
+                logo();
+                busquedaCliente(clientLoged, aClientes);
+            }
+            else
+            {
+                printf("Esta opcion no es valida\n");
+                system("pause");
+            }
             break;
         case 6:
-            system("cls");
-            logo();
-            mostrarProductos(aProductos);
-            printf("\nQuiere agregar un producto nuevo? s/n\n");
-            fflush(stdin);
-            scanf("%c", &menu);
-            if(menu == 's')
-                crearProducto(aProductos);
+            if (clientLoged.admin)
+            {
+                system("cls");
+                logo();
+                mostrarProductos(aProductos);
+                printf("\nQuiere agregar un producto nuevo? s/n\n");
+                fflush(stdin);
+                scanf("%c", &menu);
+                if(menu == 's')
+                    crearProducto(aProductos);
+            }else
+            {
+                printf("Esta opcion no es valida\n");
+                system("pause");
+            }
             break;
         case 7:
-            system("cls");
-            logo();
-            printf("Ingrese el id de un cliente: ");
-            scanf("%d", &idClint);
-            system("cls");
-            buscaPedidoIdCliente(clientLoged, idClint, aPedidos);
+            if (clientLoged.admin)
+            {
+                system("cls");
+                logo();
+                printf("Ingrese el id de un cliente: ");
+                scanf("%d", &idClint);
+                system("cls");
+                buscaPedidoIdCliente(clientLoged, idClint, aPedidos);
+            }else
+            {
+                printf("Esta opcion no es valida\n");
+                system("pause");
+            }
         }
     }
     while(op != 0);
@@ -1243,7 +1272,7 @@ void modificarPedido (stCliente cliente, char nombreArchivo[], int idPedido) // 
             case 2:
                 if (cliente.admin)
                 {
-                    printf(" Costo actual del pedido: %f \nIngrese nuevo costo: \n",aux.costoPedido);
+                    printf(" Costo actual del pedido: %f \nIngrese nuevo costo: ",aux.costoPedido);
                     scanf("%f",&aux.costoPedido);
                 }
                 break;
